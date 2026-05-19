@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Nacional de Datos del Ecosistema Social</title>
+  <style>
+    :root{
+      --green:#174B3F;
+      --blue:#143C4A;
+      --sage:#7FAF99;
+      --earth:#B68B5E;
+      --beige:#F4EFE6;
+      --bg:#F8F7F3;
+      --ink:#1D2B2A;
+      --border:#e7e2d8;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+    .layout{display:flex;min-height:100vh}
+    aside{width:290px;background:#fff;border-right:1px solid var(--border);padding:22px;position:fixed;left:0;top:0;bottom:0;box-shadow:0 1px 16px rgba(0,0,0,.04)}
+    main{margin-left:290px;width:calc(100% - 290px)}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:34px}
+    .logo{width:46px;height:46px;border-radius:18px;background:var(--green);display:grid;place-items:center;color:white;font-size:22px;font-weight:800}
+    .brand small{color:var(--green);font-weight:700;letter-spacing:.04em}
+    .brand h1{font-size:17px;line-height:1.1;margin:3px 0 0;color:var(--blue)}
+    nav button{width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:#53605d;text-align:left;padding:12px 13px;border-radius:14px;cursor:pointer;font-size:14px}
+    nav button:hover{background:#f1eee7}
+    nav button.active{background:var(--green);color:#fff}
+    .notice{position:absolute;bottom:22px;left:22px;right:22px;background:var(--beige);border-radius:18px;padding:15px;font-size:12px;line-height:1.45;color:#59625f}
+    .notice strong{display:block;color:var(--green);margin-bottom:5px}
+    header{position:sticky;top:0;z-index:3;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:18px 30px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+    header small{font-weight:800;color:var(--sage);letter-spacing:.18em;text-transform:uppercase}
+    header h2{margin:5px 0 0;color:var(--blue);font-size:28px}
+    .content{padding:28px 30px 60px}
+    .eyebrow{font-size:13px;font-weight:800;color:var(--sage);letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px}
+    .title{font-size:32px;line-height:1.1;color:var(--blue);margin:0 0 10px}
+    .lead{color:#65716d;max-width:900px;line-height:1.55;margin:0 0 24px}
+    .grid{display:grid;gap:16px}
+    .stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
+    .two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card{background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:0 1px 14px rgba(0,0,0,.04);padding:20px}
+    .stat{display:flex;justify-content:space-between;align-items:flex-start}
+    .stat p{margin:0;color:#66716d;font-size:13px}
+    .stat h3{font-size:32px;color:var(--blue);margin:9px 0 0}
+    .icon{background:var(--beige);color:var(--green);border-radius:16px;width:42px;height:42px;display:grid;place-items:center}
+    .chart{height:230px;display:flex;align-items:end;gap:9px;border-top:1px solid #f1eee7;padding-top:16px}
+    .barwrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%}
+    .bar{width:100%;border-radius:9px 9px 0 0;background:var(--green);min-height:16px}
+    .bar.blue{background:var(--blue)}
+    .bar.earth{background:var(--earth)}
+    .barlabel{font-size:11px;color:#66716d;text-align:center;max-width:80px}
+    .insight{display:flex;gap:13px;align-items:flex-start}
+    .spark{color:var(--earth);font-size:24px}
+    .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+    input,select,textarea{border:1px solid var(--border);border-radius:14px;padding:11px 12px;background:#fff;color:#42504c;font-size:14px}
+    .mapgrid{grid-template-columns:1.35fr .65fr}
+    .map{height:560px;border-radius:24px;background:linear-gradient(135deg,#e9efe7,#f8f7f3,#dde9e4);position:relative;overflow:hidden}
+    .colombia{position:absolute;left:29%;top:8%;width:46%;height:82%;border:2px dashed rgba(127,175,153,.45);border-radius:45%;background:rgba(255,255,255,.28)}
+    .pin{position:absolute;transform:translate(-50%,-50%);border:0;border-radius:15px;padding:9px 11px;background:#fff;color:var(--blue);box-shadow:0 8px 24px rgba(0,0,0,.12);cursor:pointer;text-align:left;min-width:112px}
+    .pin.active{background:var(--green);color:white}
+    .pin strong{font-size:12px}
+    .pin span{display:block;font-size:11px;opacity:.78;margin-top:3px}
+    .info-row{border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:12px}
+    .info-row small{display:block;text-transform:uppercase;color:#7b8582;font-size:11px;letter-spacing:.05em}
+    .info-row strong{display:block;color:var(--blue);margin-top:5px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th{background:var(--beige);color:#59625f;text-transform:uppercase;font-size:11px;letter-spacing:.05em;text-align:left;padding:12px}
+    td{padding:13px 12px;border-top:1px solid #eee9df;vertical-align:top}
+    tr:hover td{background:#fbfaf7}
+    .badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;background:#eef3ef;color:#27634f}
+    .badge.warn{background:#fff0d8;color:#8b5a12}
+    .badge.info{background:#e8f4fb;color:#1f6280}
+    .btn{border:0;background:var(--green);color:white;border-radius:14px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn:hover{background:var(--blue)}
+    .btn.outline{background:white;color:#50605b;border:1px solid var(--border)}
+    .profile{grid-template-columns:.8fr 1.2fr}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:var(--beige);border-radius:999px;padding:7px 10px;font-size:12px;color:#53605d}
+    .network{height:520px;background:#fbfaf7;border-radius:24px;width:100%}
+    .node-label{font-size:2.2px;fill:var(--blue)}
+    .opp{cursor:pointer}
+    .opp.selected{outline:2px solid var(--sage)}
+    .score{font-size:34px;color:var(--green);font-weight:900}
+    .alert{display:flex;gap:13px;align-items:flex-start}
+    .form{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .form input,.form select,.form textarea{width:100%}
+    .toast{position:fixed;right:24px;bottom:24px;background:var(--green);color:white;border-radius:18px;padding:14px 18px;box-shadow:0 12px 30px rgba(0,0,0,.22);display:none;z-index:20}
+    .toast.show{display:block}
+    .mobile-warning{display:none;background:var(--beige);padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px}
+    @media(max-width:1050px){
+      aside{position:static;width:100%;height:auto}
+      .layout{display:block}
+      main{margin-left:0;width:100%}
+      .notice{position:static;margin-top:16px}
+      nav{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+      .stats,.two,.three,.mapgrid,.profile,.form{grid-template-columns:1fr}
+      header{position:static}
+      .mobile-warning{display:block}
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-warning">Prototipo optimizado para computador. En celular se muestra en formato adaptado.</div>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="logo">T</div>
+        <div><small>TerritoriA</small><h1>Red Nacional de Datos</h1></div>
+      </div>
+      <nav id="nav"></nav>
+      <div class="notice">
+        <strong>Prototipo funcional</strong>
+        Datos simulados para fines de presentación. No contiene información sensible.
+      </div>
+    </aside>
+    <main>
+      <header>
+        <div>
+          <small>TerritoriA | Ecosistema Social</small>
+          <h2 id="pageTitle">Inicio</h2>
+        </div>
+        <button class="btn" onclick="toast('Reporte demo generado correctamente.')">Descargar demo</button>
+      </header>
+      <section class="content" id="app"></section>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+
+<script>
+const territories=[
+{name:"Barichara",dept:"Santander",x:58,y:38,actors:42,capital:"Capital cultural",ft:"Fundación Barichara Regenerativa",opportunities:8},
+{name:"Bogotá y Soacha",dept:"Cundinamarca",x:54,y:52,actors:64,capital:"Capital político-institucional",ft:"Fundación Territorial Paisano",opportunities:9},
+{name:"Medellín",dept:"Antioquia",x:45,y:35,actors:39,capital:"Capital financiero",ft:"Fundación Territorial Medellín",opportunities:6},
+{name:"Alto Putumayo",dept:"Putumayo",x:50,y:77,actors:28,capital:"Capital natural",ft:"Fundación Putumayo Florece",opportunities:4},
+{name:"Guasca",dept:"Cundinamarca",x:58,y:50,actors:36,capital:"Capital natural",ft:"Guasca Regenerativa",opportunities:7},
+{name:"Cali",dept:"Valle del Cauca",x:39,y:60,actors:30,capital:"Capital social",ft:"Cali Territorio en Acción",opportunities:5},
+{name:"Montes de María",dept:"Bolívar / Sucre",x:47,y:20,actors:31,capital:"Capital cultural",ft:"Sembrando Paz Montes de María",opportunities:6},
+{name:"El Tambo",dept:"Cauca",x:37,y:66,actors:24,capital:"Capital humano",ft:"Creamos El Tambo",opportunities:3},
+{name:"Florencia",dept:"Caquetá",x:55,y:70,actors:22,capital:"Capital natural",ft:"Agua, Vida y Paz",opportunities:3},
+{name:"Alta Cuenca Río Bogotá",dept:"Cundinamarca",x:61,y:49,actors:51,capital:"Capital natural",ft:"Alta Cuenca Río Bogotá",opportunities:5}
+];
+
+const actorTypes=["Organización de la sociedad civil","Fundación Territorial","Empresa local","Emprendimiento local","Colectivo comunitario","Institución pública","Universidad / centro de conocimiento","Cooperante / aliado filantrópico","Liderazgo individual"];
+const capitals=["Capital social","Capital natural","Capital cultural","Capital humano","Capital financiero","Capital físico","Capital intelectual","Capital político-institucional"];
+const topics=["Ambiente y regeneración","Seguridad alimentaria","Cultura","Juventud","Género","Paz y reconciliación","Educación","Economía local","Gobernanza comunitaria","Salud comunitaria","Agua y territorio"];
+const names=["Asociación Agroecológica de Guasca","Colectivo Jóvenes del Río","Red de Mujeres Sembradoras","Empresa Local de Economía Circular","Universidad Aliada del Territorio","Fundación Barichara Regenerativa","Fundación Territorial Paisano","Cooperativa Saberes del Monte","Mesa de Agua y Territorio","Agencia Creativa Local","Red de Productoras Campesinas","Instituto de Innovación Social","Colectivo Cultural Raíces","Emprendimiento Alimentos del Territorio","Consejo Juvenil Comunitario","Fundación Putumayo Florece","Corporación Caminos de Paz","Escuela de Liderazgos Locales","Red Ambiental Alta Cuenca","Empresa de Alimentos Saludables"];
+
+const actors=Array.from({length:58},(_,i)=>{
+ const territory=territories[i%territories.length], type=actorTypes[i%actorTypes.length], capital=capitals[(i*3)%capitals.length];
+ return {
+  id:`ACT-${String(i+1).padStart(3,"0")}`,
+  nombre:names[i%names.length]+(i>=names.length?` ${Math.floor(i/names.length)+1}`:""),
+  tipo:type,territorio:territory.name,departamento:territory.dept,capitalPrincipal:capital,
+  capitalesSecundarios:[capitals[(i+2)%capitals.length],capitals[(i+5)%capitals.length]],
+  temas:[topics[(i*2)%topics.length],topics[(i*2+3)%topics.length]],
+  descripcion:type==="Fundación Territorial"?"Actor articulador territorial que moviliza recursos, confianza y capacidades locales para fortalecer iniciativas comunitarias.":"Iniciativa territorial con capacidades locales, vínculos comunitarios y potencial de articulación con otros actores del ecosistema.",
+  recursosDisponibles:[["Voluntariado especializado","Red comunitaria","Conocimiento local"],["Espacios de encuentro","Metodologías de formación","Red de compradores"],["Mentoría técnica","Datos territoriales","Capacidad logística"]][i%3],
+  necesidades:[["Fortalecimiento administrativo","Financiación semilla"],["Comercialización","Diseño de marca"],["Gobernanza","Medición de impacto"],["Alianzas empresariales","Mentoría financiera"]][i%4],
+  nivelConfianza:3+(i%3),capacidadAbsorcion:["Baja","Media","Alta"][i%3],nivelArticulacion:["Bajo","Medio","Alto"][i%3],
+  fundacionTerritorialRelacionada:territory.ft,estadoPerfil:["Validado","Pendiente","Desactualizado","Validado"][i%4],
+  conexionesActuales:2+(i%9),oportunidadesSugeridas:1+(i%5)
+ }
+});
+
+const opportunities=[
+{need:"Diseño de marca comunitaria",seeker:"Colectivo Jóvenes del Río",provider:"Agencia Creativa Local",resource:"Voluntariado profesional",score:92,status:"Sugerida",territory:"Montes de María",reason:"Alta complementariedad entre necesidad creativa y recurso profesional; confianza media-alta y vínculo territorial cercano."},
+{need:"Canal de comercialización",seeker:"Asociación Agroecológica de Guasca",provider:"Empresa de Alimentos Saludables",resource:"Red de compradores",score:87,status:"En contacto",territory:"Guasca",reason:"Coincidencia entre producción agroecológica, capital natural y acceso a mercados locales/regionales."},
+{need:"Mentoría financiera",seeker:"Fundación Territorial en formación de El Tambo",provider:"Universidad Aliada del Territorio",resource:"Equipo de investigación y formación",score:81,status:"Sugerida",territory:"El Tambo",reason:"La universidad puede aportar formación y acompañamiento técnico para fortalecer capacidades de absorción de recursos."},
+{need:"Fortalecimiento en gobernanza",seeker:"Colectivo Comunitario de Alto Putumayo",provider:"Fundación Territorial Paisano",resource:"Asesoría entre pares",score:78,status:"En proceso",territory:"Alto Putumayo",reason:"La experiencia de una Fundación Territorial consolidada puede transferirse mediante aprendizaje entre pares."},
+{need:"Datos sobre iniciativas ambientales",seeker:"Red Ambiental Alta Cuenca",provider:"Instituto de Innovación Social",resource:"Sistematización y análisis de información",score:84,status:"Concretada",territory:"Alta Cuenca Río Bogotá",reason:"Coincidencia alta entre necesidad de evidencia ambiental y capacidad técnica de análisis."}
+];
+
+let active="Inicio";
+let selectedActor=actors[0];
+let selectedTerritory=territories[4];
+let selectedOpportunity=opportunities[0];
+
+const navItems=["Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes","Actualizar datos"];
+const icons={"Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️","Actualizar datos":"🔄"};
+
+function setActive(page){active=page;render();}
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2600)}
+function badge(v){let cls="badge"; if(["Pendiente","Sugerida"].includes(v)) cls+=" info"; if(["Media","Medio","En proceso","En contacto"].includes(v)) cls+=" warn"; return `<span class="${cls}">${v}</span>`}
+function chips(arr){return `<div class="chips">${arr.map(x=>`<span class="chip">${x}</span>`).join("")}</div>`}
+function info(label,value){return `<div class="info-row"><small>${label}</small><strong>${value}</strong></div>`}
+function section(eyebrow,title,text){return `<p class="eyebrow">${eyebrow}</p><h3 class="title">${title}</h3>${text?`<p class="lead">${text}</p>`:""}`}
+function stat(icon,label,value,note=""){return `<div class="card stat"><div><p>${label}</p><h3>${value}</h3>${note?`<p style="font-size:12px;margin-top:4px">${note}</p>`:""}</div><div class="icon">${icon}</div></div>`}
+function chartCard(title,data,color="green"){const max=Math.max(...data.map(d=>d.value));return `<div class="card"><h3 style="color:var(--blue);margin:0 0 14px">${title}</h3><div class="chart">${data.map(d=>`<div class="barwrap"><div class="bar ${color}" style="height:${Math.max(12,d.value/max*170)}px"></div><div class="barlabel">${d.name}</div></div>`).join("")}</div></div>`}
+
+function renderNav(){
+ document.getElementById("nav").innerHTML=navItems.map(n=>`<button class="${active===n?"active":""}" onclick="setActive('${n}')"><span>${icons[n]}</span>${n}</button>`).join("");
+ document.getElementById("pageTitle").textContent=active;
+}
+
+function render(){
+ renderNav();
+ const app=document.getElementById("app");
+ if(active==="Inicio") app.innerHTML=viewInicio();
+ if(active==="Mapa territorial") app.innerHTML=viewMapa();
+ if(active==="Directorio de actores") app.innerHTML=viewDirectorio();
+ if(active==="Perfil de actor") app.innerHTML=viewPerfil();
+ if(active==="Red de relaciones") app.innerHTML=viewRed();
+ if(active==="Oportunidades") app.innerHTML=viewOportunidades();
+ if(active==="Reportes") app.innerHTML=viewReportes();
+ if(active==="Actualizar datos") app.innerHTML=viewActualizar();
+}
+
+function viewInicio(){
+ const byType=actorTypes.slice(0,6).map(t=>({name:t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad"),value:actors.filter(a=>a.tipo===t).length}));
+ const byTerritory=territories.map(t=>({name:t.name.length>12?t.name.slice(0,12)+"…":t.name,value:t.actors}));
+ const needs=[{name:"Financiación",value:42},{name:"Comercial.",value:35},{name:"Gobernanza",value:29},{name:"Medición",value:24}];
+ const caps=capitals.slice(0,6).map((c,i)=>({name:c.replace("Capital ",""),value:18+i*5}));
+ return `
+ ${section("Visión general","Inteligencia territorial para conectar actores, recursos y confianza","Un prototipo de plataforma que convierte el mapeo de actores en una herramienta viva para orientar decisiones, reducir duplicidades y activar oportunidades de articulación.")}
+ <div class="grid stats">
+ ${stat("👥","Actores locales mapeados","367","Base territorial consolidada")}
+ ${stat("📍","Territorios en acción","10","Nodos activos de información")}
+ ${stat("🕸️","Conexiones identificadas","126","Relaciones de colaboración")}
+ ${stat("🤝","Oportunidades","34","Matches entre recursos y necesidades")}
+ </div>
+ <div class="grid stats">
+ ${stat("🏛️","Fundaciones vinculadas","8")}
+ ${stat("🌱","Recursos disponibles","82")}
+ ${stat("✅","Perfiles validados","72%")}
+ ${stat("🛡️","Confianza promedio","4.2/5")}
+ </div>
+ <div class="grid two" style="margin-top:20px">
+ ${chartCard("Actores por tipo",byType)}
+ ${chartCard("Actores por territorio",byTerritory,"blue")}
+ ${chartCard("Capitales territoriales predominantes",caps,"earth")}
+ ${chartCard("Necesidades más frecuentes",needs)}
+ </div>
+ <div class="grid three" style="margin-top:20px">
+ ${["Guasca y Barichara concentran alta presencia de capital natural y social.","Medellín y Bogotá-Soacha muestran mayor densidad de conexiones intersectoriales.","Montes de María y Alto Putumayo presentan oportunidades para fortalecer articulación con empresas locales."].map(i=>`<div class="card insight"><div class="spark">✦</div><p>${i}</p></div>`).join("")}
+ </div>`;
+}
+
+function filterControls(){return `<div class="filters"><select><option>Territorio</option></select><select><option>Tipo de actor</option></select><select><option>Capital</option></select><select><option>Tema</option></select><select><option>Confianza</option></select><select><option>Capacidad</option></select></div>`}
+
+function viewMapa(){
+ return `
+ ${section("Mapa territorial","Nodos territoriales y capacidades visibles","Un mapa simplificado permite identificar concentración de actores, capitales predominantes y oportunidades de articulación por territorio.")}
+ ${filterControls()}
+ <div class="grid mapgrid">
+ <div class="card"><div class="map"><div class="colombia"></div>${territories.map((t,i)=>`<button class="pin ${selectedTerritory.name===t.name?"active":""}" style="left:${t.x}%;top:${t.y}%" onclick="selectedTerritory=territories[${i}];render()"><strong>📍 ${t.name}</strong><span>${t.actors} actores · ${t.opportunities} oportunidades</span></button>`).join("")}</div></div>
+ <div class="card">
+ <p class="eyebrow">Territorio seleccionado</p><h3 style="font-size:28px;color:var(--blue);margin:0">${selectedTerritory.name}</h3><p style="color:#66716d">${selectedTerritory.dept}</p>
+ ${info("Actores identificados",selectedTerritory.actors)}
+ ${info("Capital predominante",selectedTerritory.capital)}
+ ${info("Fundación relacionada",selectedTerritory.ft)}
+ ${info("Oportunidades activas",selectedTerritory.opportunities)}
+ <div style="background:var(--beige);border-radius:18px;padding:16px;margin-top:18px"><strong style="color:var(--blue)">Lectura estratégica</strong><p style="color:#5f6b67;line-height:1.5">Este nodo presenta capacidades locales visibles, relaciones de confianza en construcción y oportunidades para conectar recursos técnicos, comunitarios y financieros.</p></div>
+ </div></div>`;
+}
+
+function viewDirectorio(){
+ return `
+ ${section("Directorio inteligente","Actores del ecosistema social","Busca, filtra y consulta fichas de organizaciones, empresas, colectivos, instituciones, liderazgos y Fundaciones Territoriales.")}
+ <div class="card"><div class="filters"><input id="search" placeholder="Buscar por actor, territorio, capital o tema..." oninput="renderDirectoryTable()" style="flex:1;min-width:300px"><select id="territoryFilter" onchange="renderDirectoryTable()"><option>Todos</option>${territories.map(t=>`<option>${t.name}</option>`).join("")}</select></div></div>
+ <div class="card" style="margin-top:16px;overflow:auto"><table><thead><tr><th>Nombre</th><th>Tipo</th><th>Territorio</th><th>Capital</th><th>Confianza</th><th>Absorción</th><th>Estado</th><th></th></tr></thead><tbody id="directoryTable"></tbody></table></div>`;
+}
+
+function renderDirectoryTable(){
+ const q=(document.getElementById("search")?.value||"").toLowerCase();
+ const terr=document.getElementById("territoryFilter")?.value||"Todos";
+ const filtered=actors.filter(a=>(`${a.nombre} ${a.tipo} ${a.territorio} ${a.capitalPrincipal}`.toLowerCase().includes(q))&&(terr==="Todos"||a.territorio===terr)).slice(0,30);
+ document.getElementById("directoryTable").innerHTML=filtered.map((a,i)=>{
+   const realIndex=actors.indexOf(a);
+   return `<tr><td><strong style="color:var(--blue)">${a.nombre}</strong></td><td>${a.tipo}</td><td>${a.territorio}</td><td>${badge(a.capitalPrincipal)}</td><td>${a.nivelConfianza}/5</td><td>${badge(a.capacidadAbsorcion)}</td><td>${badge(a.estadoPerfil)}</td><td><button class="btn outline" onclick="selectedActor=actors[${realIndex}];setActive('Perfil de actor')">Ver perfil</button></td></tr>`
+ }).join("");
+}
+window.renderDirectoryTable=renderDirectoryTable;
+
+function viewPerfil(){
+ const a=selectedActor;
+ return `${section("Perfil de actor",a.nombre,"Ficha integral para entender capacidades, necesidades, recursos disponibles y potencial de articulación.")}
+ <div class="grid profile">
+ <div class="card">
+ <div class="logo" style="margin-bottom:18px">🏛️</div><h3 style="font-size:28px;color:var(--blue);margin:0">${a.nombre}</h3><p style="color:#5f6b67;line-height:1.5">${a.descripcion}</p>
+ <div class="chips">${badge(a.estadoPerfil)}${badge("Absorción "+a.capacidadAbsorcion)}${badge("Articulación "+a.nivelArticulacion)}</div>
+ <div style="margin-top:20px">${info("Tipo",a.tipo)}${info("Territorio",a.territorio+", "+a.departamento)}${info("Fundación relacionada",a.fundacionTerritorialRelacionada)}${info("Nivel de confianza",a.nivelConfianza+"/5")}</div>
+ </div>
+ <div>
+ <div class="card grid two">${detailBlock("Capitales territoriales",[a.capitalPrincipal,...a.capitalesSecundarios])}${detailBlock("Temas de trabajo",a.temas)}${detailBlock("Recursos disponibles",a.recursosDisponibles)}${detailBlock("Necesidades",a.necesidades)}${info("Conexiones actuales",a.conexionesActuales)}${info("Oportunidades sugeridas",a.oportunidadesSugeridas)}</div>
+ <div class="grid three" style="margin-top:16px"><button class="btn" onclick="toast('Conexión sugerida creada para revisión del nodo territorial.')">🤝 Sugerir conexión</button><button class="btn outline" onclick="toast('Formulario de actualización abierto en modo demo.')">🔄 Actualizar información</button><button class="btn outline" onclick="toast('Reporte del actor generado correctamente.')">⬇ Generar reporte</button></div>
+ </div></div>`;
+}
+
+function detailBlock(title,items){return `<div><h3 style="color:var(--blue);font-size:17px">${title}</h3>${chips(items)}</div>`}
+
+function viewRed(){
+ const nodes=actors.slice(0,24).map((a,index)=>({id:a.id,label:a.nombre.split(" ").slice(0,3).join(" "),type:a.tipo,x:50+Math.cos(index/24*Math.PI*2)*(index%3===0?34:25),y:50+Math.sin(index/24*Math.PI*2)*(index%3===0?30:22),size:7+(a.conexionesActuales%8)}));
+ const links=nodes.slice(0,23).map((n,i)=>({from:n.id,to:nodes[(i*5+3)%nodes.length].id,strength:1+(i%4)}));
+ function color(type){if(type.includes("Fundación"))return "#174B3F"; if(type.includes("Empresa")||type.includes("Emprendimiento"))return "#B68B5E"; if(type.includes("Institución"))return "#143C4A"; if(type.includes("Universidad"))return "#596D80"; if(type.includes("Cooperante"))return "#7A5C99"; return "#7FAF99";}
+ return `${section("Análisis relacional","Red de relaciones, confianza y colaboración","La plataforma no solo identifica quién existe; también permite reconocer quién conecta, quién está aislado y dónde hay oportunidades para fortalecer el tejido social.")}
+ <div class="grid stats">${stat("🕸️","Densidad de red","0.42")}${stat("👥","Actores puente","12")}${stat("🤝","Conexiones intersectoriales","48")}${stat("⚠️","Actores aislados","9")}</div>
+ <div class="grid mapgrid">
+ <div class="card"><svg viewBox="0 0 100 100" class="network">${links.map((l,i)=>{const f=nodes.find(n=>n.id===l.from),t=nodes.find(n=>n.id===l.to);return `<line x1="${f.x}" y1="${f.y}" x2="${t.x}" y2="${t.y}" stroke="#8DA69A" stroke-width="${.25+l.strength*.18}" opacity=".55"/>`}).join("")}${nodes.map(n=>`<g><circle cx="${n.x}" cy="${n.y}" r="${n.size/2.2}" fill="${color(n.type)}" opacity=".92"/><text x="${n.x}" y="${n.y+n.size/2+3}" text-anchor="middle" class="node-label">${n.label}</text></g>`).join("")}</svg></div>
+ <div class="card"><h3 style="color:var(--blue);font-size:24px">Actores catalizadores</h3><p style="color:#66716d">Nodos con alta capacidad para conectar confianza, saberes y recursos.</p>${["Fundación Territorial Guasca Regenerativa","Fundación Barichara Regenerativa","Red Jóvenes del Río","Universidad Aliada del Territorio","Empresa Local de Economía Circular"].map((a,i)=>`<div class="info-row"><strong>${a}</strong><small>Centralidad estimada: ${88-i*6}%</small></div>`).join("")}</div>
+ </div>`;
+}
+
+function viewOportunidades(){
+ return `${section("Matching territorial","Oportunidades de articulación","Cruce inteligente entre necesidades, recursos disponibles, confianza, territorio compartido y capacidad de absorción.")}
+ <div class="grid stats">${stat("✦","Identificadas","34")}${stat("🤝","En contacto","12")}${stat("🔄","En proceso","8")}${stat("✅","Concretadas","5")}</div>
+ <div class="card" style="margin:18px 0"><strong style="color:var(--blue)">Criterios de coincidencia:</strong> territorio compartido, complementariedad entre necesidad y recurso, nivel de confianza, capacidad de absorción y relación con una Fundación Territorial.</div>
+ <div class="grid mapgrid">
+ <div class="grid">${opportunities.map((o,i)=>`<div class="card opp ${selectedOpportunity.need===o.need?"selected":""}" onclick="selectedOpportunity=opportunities[${i}];render()"><div style="display:flex;justify-content:space-between;gap:18px"><div><h3 style="color:var(--blue);margin:0">${o.need} ${badge(o.status)}</h3><p><strong>${o.seeker}</strong> necesita conectar con <strong>${o.provider}</strong></p><small>Recurso disponible: ${o.resource} · ${o.territory}</small></div><div class="score">${o.score}%</div></div></div>`).join("")}</div>
+ <div class="card"><p class="eyebrow">Detalle de coincidencia</p><h3 style="font-size:26px;color:var(--blue);margin-top:0">${selectedOpportunity.need}</h3><p style="color:#5f6b67;line-height:1.5">${selectedOpportunity.reason}</p>${info("Actor que necesita",selectedOpportunity.seeker)}${info("Actor que aporta",selectedOpportunity.provider)}${info("Recurso disponible",selectedOpportunity.resource)}${info("Estado",selectedOpportunity.status)}<button class="btn" style="width:100%" onclick="toast('Oportunidad de articulación creada. Se recomienda activar una mesa de trabajo.')">Conectar actores</button></div>
+ </div>`;
+}
+
+function viewReportes(){
+ const alerts=["Guasca presenta alta concentración de actores ambientales, pero baja conexión con empresas locales. Se recomienda activar una mesa de economía regenerativa.","Montes de María cuenta con capital cultural fuerte, pero requiere mayor articulación con financiadores.","Alto Putumayo presenta actores comunitarios activos, pero baja densidad de relaciones intersectoriales.","Bogotá y Soacha muestran alto potencial para pilotear mecanismos de coinversión."];
+ return `${section("Reportes territoriales","Alertas, prioridades y decisiones sugeridas","El sistema transforma datos dispersos en insumos para orientar inversión social, acompañamiento territorial y expansión de Fundaciones Territoriales.")}
+ <div class="grid two">${chartCard("Densidad de red por territorio",territories.slice(0,7).map((t,i)=>({name:t.name.slice(0,11),value:28+i*6})))}${chartCard("Oportunidades de inversión social",[{name:"Ambiente",value:12},{name:"Cultura",value:9},{name:"Juventud",value:8},{name:"Economía",value:7},{name:"Gobernanza",value:6}],"blue")}</div>
+ <div class="grid two" style="margin-top:20px">${alerts.map(a=>`<div class="card alert"><div class="spark">⚠️</div><p>${a}</p></div>`).join("")}</div>
+ <div class="filters" style="margin-top:20px"><button class="btn" onclick="toast('Reporte descargado en modo demo.')">Descargar reporte</button><button class="btn" onclick="toast('Recomendación generada correctamente.')">Generar recomendación</button><button class="btn" onclick="toast('Territorio priorizado para análisis.')">Priorizar territorio</button></div>`;
+}
+
+function viewActualizar(){
+ return `${section("Gobernanza de datos","Actualizar información del ecosistema","Formulario simulado para que los nodos territoriales mantengan viva y validada la información de actores, recursos y necesidades.")}
+ <div class="card"><div class="grid form">
+ <input placeholder="Nombre del actor"><input placeholder="Departamento"><textarea placeholder="Descripción"></textarea><textarea placeholder="Recursos disponibles"></textarea><textarea placeholder="Necesidades"></textarea>
+ <select><option>Tipo de actor</option>${actorTypes.map(x=>`<option>${x}</option>`).join("")}</select>
+ <select><option>Territorio</option>${territories.map(x=>`<option>${x.name}</option>`).join("")}</select>
+ <select><option>Capital principal</option>${capitals.map(x=>`<option>${x}</option>`).join("")}</select>
+ <select><option>Tema de trabajo</option>${topics.map(x=>`<option>${x}</option>`).join("")}</select>
+ <select><option>Nivel de confianza</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+ <select><option>Capacidad de absorción</option><option>Baja</option><option>Media</option><option>Alta</option></select>
+ </div><div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="btn" onclick="toast('Información enviada para validación por el nodo territorial.')">Enviar actualización</button></div></div>`;
+}
+
+render();
+if(active==="Directorio de actores") renderDirectoryTable();
+const oldRender=render;
+render=function(){oldRender(); if(active==="Directorio de actores") setTimeout(renderDirectoryTable,0);}
+</script>
+</body>
+</html>
