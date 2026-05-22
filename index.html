@@ -131,7 +131,7 @@
 <script>
 const territories=[
 {name:"Barichara",dept:"Santander",x:58,y:38,actors:42,capital:"Capital cultural",ft:"Fundación Barichara Regenerativa",opportunities:8},
-{name:"Bogotá y Soacha",dept:"Cundinamarca",x:54,y:52,actors:64,capital:"Capital político-institucional",ft:"Fundación Territorial Paisano",opportunities:9},
+{name:"Bogotá",dept:"Cundinamarca",x:54,y:52,actors:64,capital:"Capital político-institucional",ft:"Fundación Territorial Paisano",opportunities:9},
 {name:"Medellín",dept:"Antioquia",x:45,y:35,actors:39,capital:"Capital financiero",ft:"Fundación Territorial Medellín",opportunities:6},
 {name:"Alto Putumayo",dept:"Putumayo",x:50,y:77,actors:28,capital:"Capital natural",ft:"Fundación Putumayo Florece",opportunities:4},
 {name:"Guasca",dept:"Cundinamarca",x:58,y:50,actors:36,capital:"Capital natural",ft:"Guasca Regenerativa",opportunities:7},
@@ -233,7 +233,7 @@ function viewInicio(){
  ${chartCard("Necesidades más frecuentes",needs)}
  </div>
  <div class="grid three" style="margin-top:20px">
- ${["Guasca y Barichara concentran alta presencia de capital natural y social.","Medellín y Bogotá-Soacha muestran mayor densidad de conexiones intersectoriales.","Montes de María y Alto Putumayo presentan oportunidades para fortalecer articulación con empresas locales."].map(i=>`<div class="card insight"><div class="spark">✦</div><p>${i}</p></div>`).join("")}
+ ${["Guasca y Barichara concentran alta presencia de capital natural y social.","Medellín y Bogotá muestra mayor densidad de conexiones intersectoriales.","Montes de María y Alto Putumayo presentan oportunidades para fortalecer articulación con empresas locales."].map(i=>`<div class="card insight"><div class="spark">✦</div><p>${i}</p></div>`).join("")}
  </div>`;
 }
 
@@ -313,7 +313,7 @@ function viewOportunidades(){
 }
 
 function viewReportes(){
- const alerts=["Guasca presenta alta concentración de actores ambientales, pero baja conexión con empresas locales. Se recomienda activar una mesa de economía regenerativa.","Montes de María cuenta con capital cultural fuerte, pero requiere mayor articulación con financiadores.","Alto Putumayo presenta actores comunitarios activos, pero baja densidad de relaciones intersectoriales.","Bogotá y Soacha muestran alto potencial para pilotear mecanismos de coinversión."];
+ const alerts=["Guasca presenta alta concentración de actores ambientales, pero baja conexión con empresas locales. Se recomienda activar una mesa de economía regenerativa.","Montes de María cuenta con capital cultural fuerte, pero requiere mayor articulación con financiadores.","Alto Putumayo presenta actores comunitarios activos, pero baja densidad de relaciones intersectoriales.","Bogotá muestra alto potencial para pilotear mecanismos de coinversión."];
  return `${section("Reportes territoriales","Alertas, prioridades y decisiones sugeridas","El sistema transforma datos dispersos en insumos para orientar inversión social, acompañamiento territorial y expansión de Fundaciones Territoriales.")}
  <div class="grid two">${chartCard("Densidad de red por territorio",territories.slice(0,7).map((t,i)=>({name:t.name.slice(0,11),value:28+i*6})))}${chartCard("Oportunidades de inversión social",[{name:"Ambiente",value:12},{name:"Cultura",value:9},{name:"Juventud",value:8},{name:"Economía",value:7},{name:"Gobernanza",value:6}],"blue")}</div>
  <div class="grid two" style="margin-top:20px">${alerts.map(a=>`<div class="card alert"><div class="spark">⚠️</div><p>${a}</p></div>`).join("")}</div>
