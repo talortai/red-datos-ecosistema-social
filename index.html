@@ -6,14 +6,14 @@
   <title>Red Nacional de Datos del Ecosistema Social</title>
   <style>
     :root{
-      --green:#174B3F;
-      --blue:#143C4A;
-      --sage:#7FAF99;
-      --earth:#B68B5E;
-      --beige:#F4EFE6;
-      --bg:#F8F7F3;
-      --ink:#1D2B2A;
-      --border:#e7e2d8;
+      --green:#4F7C45;
+      --blue:#305C5A;
+      --sage:#A8B88A;
+      --earth:#C77945;
+      --beige:#F3E6D3;
+      --bg:#FAF6EF;
+      --ink:#26332D;
+      --border:#E6D8C4;
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
@@ -56,7 +56,7 @@
     .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
     input,select,textarea{border:1px solid var(--border);border-radius:14px;padding:11px 12px;background:#fff;color:#42504c;font-size:14px}
     .mapgrid{grid-template-columns:1.35fr .65fr}
-    .map{height:560px;border-radius:24px;background:linear-gradient(135deg,#e9efe7,#f8f7f3,#dde9e4);position:relative;overflow:hidden}
+    .map{height:560px;border-radius:24px;background:linear-gradient(135deg,#E8E2C8,#FAF6EF,#DDE6D1);position:relative;overflow:hidden}
     .colombia{position:absolute;left:29%;top:8%;width:46%;height:82%;border:2px dashed rgba(127,175,153,.45);border-radius:45%;background:rgba(255,255,255,.28)}
     .pin{position:absolute;transform:translate(-50%,-50%);border:0;border-radius:15px;padding:9px 11px;background:#fff;color:var(--blue);box-shadow:0 8px 24px rgba(0,0,0,.12);cursor:pointer;text-align:left;min-width:112px}
     .pin.active{background:var(--green);color:white}
@@ -69,9 +69,9 @@
     th{background:var(--beige);color:#59625f;text-transform:uppercase;font-size:11px;letter-spacing:.05em;text-align:left;padding:12px}
     td{padding:13px 12px;border-top:1px solid #eee9df;vertical-align:top}
     tr:hover td{background:#fbfaf7}
-    .badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;background:#eef3ef;color:#27634f}
+    .badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;background:#EEF3E5;color:#4F7C45}
     .badge.warn{background:#fff0d8;color:#8b5a12}
-    .badge.info{background:#e8f4fb;color:#1f6280}
+    .badge.info{background:#E4EFEA;color:#305C5A}
     .btn{border:0;background:var(--green);color:white;border-radius:14px;padding:10px 14px;font-weight:700;cursor:pointer}
     .btn:hover{background:var(--blue)}
     .btn.outline{background:white;color:#50605b;border:1px solid var(--border)}
@@ -293,11 +293,11 @@ function detailBlock(title,items){return `<div><h3 style="color:var(--blue);font
 function viewRed(){
  const nodes=actors.slice(0,24).map((a,index)=>({id:a.id,label:a.nombre.split(" ").slice(0,3).join(" "),type:a.tipo,x:50+Math.cos(index/24*Math.PI*2)*(index%3===0?34:25),y:50+Math.sin(index/24*Math.PI*2)*(index%3===0?30:22),size:7+(a.conexionesActuales%8)}));
  const links=nodes.slice(0,23).map((n,i)=>({from:n.id,to:nodes[(i*5+3)%nodes.length].id,strength:1+(i%4)}));
- function color(type){if(type.includes("Fundación"))return "#174B3F"; if(type.includes("Empresa")||type.includes("Emprendimiento"))return "#B68B5E"; if(type.includes("Institución"))return "#143C4A"; if(type.includes("Universidad"))return "#596D80"; if(type.includes("Cooperante"))return "#7A5C99"; return "#7FAF99";}
+ function color(type){if(type.includes("Fundación"))return "#4F7C45"; if(type.includes("Empresa")||type.includes("Emprendimiento"))return "#C77945"; if(type.includes("Institución"))return "#305C5A"; if(type.includes("Universidad"))return "#8A7A55"; if(type.includes("Cooperante"))return "#9B6F45"; return "#A8B88A";}
  return `${section("Análisis relacional","Red de relaciones, confianza y colaboración","La plataforma no solo identifica quién existe; también permite reconocer quién conecta, quién está aislado y dónde hay oportunidades para fortalecer el tejido social.")}
  <div class="grid stats">${stat("🕸️","Densidad de red","0.42")}${stat("👥","Actores puente","12")}${stat("🤝","Conexiones intersectoriales","48")}${stat("⚠️","Actores aislados","9")}</div>
  <div class="grid mapgrid">
- <div class="card"><svg viewBox="0 0 100 100" class="network">${links.map((l,i)=>{const f=nodes.find(n=>n.id===l.from),t=nodes.find(n=>n.id===l.to);return `<line x1="${f.x}" y1="${f.y}" x2="${t.x}" y2="${t.y}" stroke="#8DA69A" stroke-width="${.25+l.strength*.18}" opacity=".55"/>`}).join("")}${nodes.map(n=>`<g><circle cx="${n.x}" cy="${n.y}" r="${n.size/2.2}" fill="${color(n.type)}" opacity=".92"/><text x="${n.x}" y="${n.y+n.size/2+3}" text-anchor="middle" class="node-label">${n.label}</text></g>`).join("")}</svg></div>
+ <div class="card"><svg viewBox="0 0 100 100" class="network">${links.map((l,i)=>{const f=nodes.find(n=>n.id===l.from),t=nodes.find(n=>n.id===l.to);return `<line x1="${f.x}" y1="${f.y}" x2="${t.x}" y2="${t.y}" stroke="#A8B88A" stroke-width="${.25+l.strength*.18}" opacity=".55"/>`}).join("")}${nodes.map(n=>`<g><circle cx="${n.x}" cy="${n.y}" r="${n.size/2.2}" fill="${color(n.type)}" opacity=".92"/><text x="${n.x}" y="${n.y+n.size/2+3}" text-anchor="middle" class="node-label">${n.label}</text></g>`).join("")}</svg></div>
  <div class="card"><h3 style="color:var(--blue);font-size:24px">Actores catalizadores</h3><p style="color:#66716d">Nodos con alta capacidad para conectar confianza, saberes y recursos.</p>${["Fundación Territorial Guasca Regenerativa","Fundación Barichara Regenerativa","Red Jóvenes del Río","Universidad Aliada del Territorio","Empresa Local de Economía Circular"].map((a,i)=>`<div class="info-row"><strong>${a}</strong><small>Centralidad estimada: ${88-i*6}%</small></div>`).join("")}</div>
  </div>`;
 }
