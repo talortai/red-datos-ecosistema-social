@@ -176,7 +176,83 @@ let active="Inicio";
 let selectedActor=actors[0];
 let selectedTerritory=territories[4];
 let selectedOpportunity=opportunities[0];
+let mapFilters={
+  territorio:"Todos",
+  tipo:"Todos",
+  capital:"Todos",
+  tema:"Todos",
+  confianza:"Todos",
+  capacidad:"Todos"
+};
 
+function hasActiveMapFilters(){
+  return Object.values(mapFilters).some(v=>v!=="Todos");
+}
+
+function optionTag(value,label,current){
+  return `<option value="${value}" ${current===value?"selected":""}>${label||value}</option>`;
+}
+
+function mapFilteredActors(){
+  return actors.filter(a=>{
+    const f=mapFilters;
+
+    const matchTerritory=f.territorio==="Todos" || a.territorio===f.territorio;
+    const matchType=f.tipo==="Todos" || a.tipo===f.tipo;
+    const matchCapital=f.capital==="Todos" || a.capitalPrincipal===f.capital || a.capitalesSecundarios.includes(f.capital);
+    const matchTopic=f.tema==="Todos" || a.temas.includes(f.tema);
+    
+    const matchTrust=
+      f.confianza==="Todos" ||
+      (f.confianza==="Alta" && a.nivelConfianza>=4) ||
+      (f.confianza==="Media" && a.nivelConfianza===3) ||
+      (f.confianza==="Baja" && a.nivelConfianza<=2) ||
+      String(a.nivelConfianza)===f.confianza;
+
+    const matchCapacity=f.capacidad==="Todos" || a.capacidadAbsorcion===f.capacidad;
+
+    return matchTerritory && matchType && matchCapital && matchTopic && matchTrust && matchCapacity;
+  });
+}
+
+function territoryMatchInfo(){
+  const filtered=mapFilteredActors();
+  const filtering=hasActiveMapFilters();
+
+  return territories.map(t=>{
+    const matchingActors=filtered.filter(a=>a.territorio===t.name);
+
+    return {
+      ...t,
+      matchCount:filtering ? matchingActors.length : t.actors,
+      matchingActors
+    };
+  });
+}
+
+function updateMapFilter(key,value){
+  mapFilters[key]=value;
+
+  const matches=territoryMatchInfo().filter(t=>t.matchCount>0);
+
+  if(matches.length && !matches.some(t=>t.name===selectedTerritory.name)){
+    selectedTerritory=territories.find(t=>t.name===matches[0].name) || selectedTerritory;
+  }
+
+  render();
+}
+
+function resetMapFilters(){
+  mapFilters={
+    territorio:"Todos",
+    tipo:"Todos",
+    capital:"Todos",
+    tema:"Todos",
+    confianza:"Todos",
+    capacidad:"Todos"
+  };
+  render();
+}
 const navItems=["Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes","Actualizar datos"];
 const icons={"Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️","Actualizar datos":"🔄"};
 
@@ -237,22 +313,139 @@ function viewInicio(){
  </div>`;
 }
 
-function filterControls(){return `<div class="filters"><select><option>Territorio</option><option>Bogotá</option><option>Medellin</option><option>Alto Putumayo</option><option>Guasca</option><option>Cali</option><option>Montes de María</option><option>El Tambo</option><option>Florencia</option><option>Alta Cuenca</option></select><select><option>Tipo de actor</option></select><select><option>Capital</option></select><select><option>Tema</option></select><select><option>Confianza</option></select><select><option>Capacidad</option></select></div>`}
+function filterControls(){
+  return `
+  <div class="filters">
+    <select onchange="updateMapFilter('territorio',this.value)">
+      ${optionTag("Todos","Todos los territorios",mapFilters.territorio)}
+      ${territories.map(t=>optionTag(t.name,t.name,mapFilters.territorio)).join("")}
+    </select>
+
+    <select onchange="updateMapFilter('tipo',this.value)">
+      ${optionTag("Todos","Todos los tipos de actor",mapFilters.tipo)}
+      ${actorTypes.map(t=>optionTag(t,t,mapFilters.tipo)).join("")}
+    </select>
+
+    <select onchange="updateMapFilter('capital',this.value)">
+      ${optionTag("Todos","Todos los capitales",mapFilters.capital)}
+      ${capitals.map(c=>optionTag(c,c,mapFilters.capital)).join("")}
+    </select>
+
+    <select onchange="updateMapFilter('tema',this.value)">
+      ${optionTag("Todos","Todos los temas",mapFilters.tema)}
+      ${topics.map(t=>optionTag(t,t,mapFilters.tema)).join("")}
+    </select>
+
+    <select onchange="updateMapFilter('confianza',this.value)">
+      ${optionTag("Todos","Todos los niveles de confianza",mapFilters.confianza)}
+      ${optionTag("Alta","Confianza alta: 4 a 5",mapFilters.confianza)}
+      ${optionTag("Media","Confianza media: 3",mapFilters.confianza)}
+      ${optionTag("Baja","Confianza baja: 1 a 2",mapFilters.confianza)}
+      ${optionTag("5","Nivel 5",mapFilters.confianza)}
+      ${optionTag("4","Nivel 4",mapFilters.confianza)}
+      ${optionTag("3","Nivel 3",mapFilters.confianza)}
+      ${optionTag("2","Nivel 2",mapFilters.confianza)}
+      ${optionTag("1","Nivel 1",mapFilters.confianza)}
+    </select>
+
+    <select onchange="updateMapFilter('capacidad',this.value)">
+      ${optionTag("Todos","Todas las capacidades",mapFilters.capacidad)}
+      ${optionTag("Alta","Capacidad alta",mapFilters.capacidad)}
+      ${optionTag("Media","Capacidad media",mapFilters.capacidad)}
+      ${optionTag("Baja","Capacidad baja",mapFilters.capacidad)}
+    </select>
+
+    <button class="btn outline" onclick="resetMapFilters()">Limpiar filtros</button>
+  </div>`;
+}
 
 function viewMapa(){
+ const filtering=hasActiveMapFilters();
+ const matchInfo=territoryMatchInfo();
+ const visibleTerritories=filtering ? matchInfo.filter(t=>t.matchCount>0) : matchInfo;
+ const selectedInfo=matchInfo.find(t=>t.name===selectedTerritory.name) || matchInfo[0];
+ const selectedMatches=selectedInfo?.matchingActors || [];
+ const totalMatches=matchInfo.reduce((sum,t)=>sum+t.matchCount,0);
+
  return `
- ${section("Mapa territorial","Nodos territoriales y capacidades visibles","Un mapa simplificado permite identificar concentración de actores, capitales predominantes y oportunidades de articulación por territorio.")}
+ ${section(
+   "Mapa territorial",
+   "Nodos territoriales y capacidades visibles",
+   "Un mapa simplificado permite identificar concentración de actores, capitales predominantes y oportunidades de articulación por territorio. Los filtros permiten explorar dónde se concentran ciertos tipos de actores, capitales, temas, niveles de confianza y capacidades de absorción."
+ )}
  ${filterControls()}
+
+ ${filtering ? `
+ <div class="card" style="margin-bottom:16px">
+   <strong style="color:var(--blue)">Resultado del filtro:</strong>
+   <span style="color:#5f6b67">
+     ${totalMatches} actores coinciden con los criterios seleccionados en ${visibleTerritories.length} territorio(s).
+   </span>
+ </div>` : ""}
+
  <div class="grid mapgrid">
- <div class="card"><div class="map"><div class="colombia"></div>${territories.map((t,i)=>`<button class="pin ${selectedTerritory.name===t.name?"active":""}" style="left:${t.x}%;top:${t.y}%" onclick="selectedTerritory=territories[${i}];render()"><strong>📍 ${t.name}</strong><span>${t.actors} actores · ${t.opportunities} oportunidades</span></button>`).join("")}</div></div>
- <div class="card">
- <p class="eyebrow">Territorio seleccionado</p><h3 style="font-size:28px;color:var(--blue);margin:0">${selectedTerritory.name}</h3><p style="color:#66716d">${selectedTerritory.dept}</p>
- ${info("Actores identificados",selectedTerritory.actors)}
- ${info("Capital predominante",selectedTerritory.capital)}
- ${info("Fundación relacionada",selectedTerritory.ft)}
- ${info("Oportunidades activas",selectedTerritory.opportunities)}
- <div style="background:var(--beige);border-radius:18px;padding:16px;margin-top:18px"><strong style="color:var(--blue)">Lectura estratégica</strong><p style="color:#5f6b67;line-height:1.5">Este nodo presenta capacidades locales visibles, relaciones de confianza en construcción y oportunidades para conectar recursos técnicos, comunitarios y financieros.</p></div>
- </div></div>`;
+   <div class="card">
+     <div class="map">
+       <div class="colombia"></div>
+
+       ${visibleTerritories.length ? visibleTerritories.map(t=>{
+         const realIndex=territories.findIndex(x=>x.name===t.name);
+         return `
+         <button 
+           class="pin ${selectedTerritory.name===t.name?"active":""}" 
+           style="left:${t.x}%;top:${t.y}%"
+           onclick="selectedTerritory=territories[${realIndex}];render()">
+           <strong>📍 ${t.name}</strong>
+           <span>
+             ${filtering 
+               ? `${t.matchCount} coincidencia${t.matchCount===1?"":"s"}`
+               : `${t.actors} actores · ${t.opportunities} oportunidades`
+             }
+           </span>
+         </button>`;
+       }).join("") : `
+       <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:white;border:1px solid var(--border);border-radius:20px;padding:18px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08);max-width:320px">
+         <strong style="color:var(--blue)">No hay coincidencias</strong>
+         <p style="color:#66716d;margin-bottom:0">Prueba limpiar los filtros o ampliar los criterios de búsqueda.</p>
+       </div>`}
+     </div>
+   </div>
+
+   <div class="card">
+     <p class="eyebrow">Territorio seleccionado</p>
+     <h3 style="font-size:28px;color:var(--blue);margin:0">${selectedInfo.name}</h3>
+     <p style="color:#66716d">${selectedInfo.dept}</p>
+
+     ${filtering 
+       ? info("Actores que cumplen los filtros",selectedInfo.matchCount)
+       : info("Actores identificados",selectedInfo.actors)
+     }
+
+     ${info("Capital predominante",selectedInfo.capital)}
+     ${info("Fundación relacionada",selectedInfo.ft)}
+     ${info("Oportunidades activas",selectedInfo.opportunities)}
+
+     ${filtering ? `
+     <div style="margin-top:18px">
+       <strong style="color:var(--blue)">Actores encontrados</strong>
+       ${selectedMatches.length ? selectedMatches.slice(0,6).map(a=>`
+         <div class="info-row">
+           <small>${a.tipo}</small>
+           <strong>${a.nombre}</strong>
+           <div style="margin-top:8px">${badge(a.capitalPrincipal)} ${badge("Confianza "+a.nivelConfianza+"/5")} ${badge("Absorción "+a.capacidadAbsorcion)}</div>
+         </div>
+       `).join("") : `
+         <p style="color:#66716d;line-height:1.5">Este territorio no tiene actores que coincidan con los filtros seleccionados.</p>
+       `}
+     </div>` : `
+     <div style="background:var(--beige);border-radius:18px;padding:16px;margin-top:18px">
+       <strong style="color:var(--blue)">Lectura estratégica</strong>
+       <p style="color:#5f6b67;line-height:1.5">
+         Este nodo presenta capacidades locales visibles, relaciones de confianza en construcción y oportunidades para conectar recursos técnicos, comunitarios y financieros.
+       </p>
+     </div>`}
+   </div>
+ </div>`;
 }
 
 function viewDirectorio(){
