@@ -333,7 +333,7 @@ let selectedActor=actors[0];
 let selectedTerritory=territories[4];
 let selectedOpportunity=opportunities[0];
 let selectedNetworkNode=null;
-let networkFilters={
+let mapFilters={
   territorio:"Todos",
   tipo:"Todos",
   capital:"Todos",
@@ -703,18 +703,8 @@ function viewPerfil(){
 }
 
 function detailBlock(title,items){return `<div><h3 style="color:var(--blue);font-size:17px">${title}</h3>${chips(items)}</div>`}
-  
-function hasActiveNetworkFilters(){...}
 
-function networkFilteredActors(){...}
-
-function updateNetworkFilter(key,value){...}
-
-function resetNetworkFilters(){...}
-
-function networkFilterControls(){...}
-  
-function viewOportunidades(){
+function viewRed(){
  const visibleActors=actors.slice(0,24);
 
  const typeColors={
