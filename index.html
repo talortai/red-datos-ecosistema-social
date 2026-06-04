@@ -56,6 +56,110 @@
     .barlabel{font-size:11px;color:#66716d;text-align:center;max-width:80px}
     .insight{display:flex;gap:13px;align-items:flex-start}
     .spark{color:var(--earth);font-size:24px}
+  .decision-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  margin:22px 0;
+}
+
+.decision-card{
+  border:1px solid var(--border);
+  background:linear-gradient(135deg,#fff,#fbf7ef);
+  border-radius:24px;
+  padding:22px;
+  cursor:pointer;
+  transition:.18s ease;
+  min-height:210px;
+  position:relative;
+  overflow:hidden;
+}
+
+.decision-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 14px 30px rgba(0,0,0,.08);
+  border-color:var(--sage);
+}
+
+.decision-icon{
+  width:48px;
+  height:48px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:var(--beige);
+  color:var(--green);
+  font-size:24px;
+  margin-bottom:16px;
+}
+
+.decision-card h3{
+  color:var(--blue);
+  font-size:22px;
+  margin:0 0 10px;
+}
+
+.decision-card p{
+  color:#5f6b67;
+  line-height:1.5;
+  margin:0 0 16px;
+}
+
+.decision-action{
+  position:absolute;
+  left:22px;
+  right:22px;
+  bottom:18px;
+  color:var(--green);
+  font-weight:800;
+  font-size:13px;
+}
+
+.intelligence-strip{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:16px;
+  margin-top:20px;
+}
+
+.priority-list{
+  display:grid;
+  gap:10px;
+}
+
+.priority-item{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:14px;
+  background:#fff;
+}
+
+.priority-item strong{
+  color:var(--blue);
+}
+
+.priority-item small{
+  display:block;
+  color:#66716d;
+  margin-top:4px;
+}
+
+.priority-score{
+  font-weight:900;
+  color:var(--green);
+  font-size:22px;
+}
+
+@media(max-width:1050px){
+  .decision-grid,
+  .intelligence-strip{
+    grid-template-columns:1fr;
+  }
+}
     .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
     input,select,textarea{border:1px solid var(--border);border-radius:14px;padding:11px 12px;background:#fff;color:#42504c;font-size:14px}
     .mapgrid{grid-template-columns:1.35fr .65fr}
@@ -522,6 +626,140 @@ function render(){
 }
 
 function viewInicio(){
+ const byType=actorTypes.slice(0,6).map(t=>({
+   name:t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad"),
+   value:actors.filter(a=>a.tipo===t).length
+ }));
+
+ const byTerritory=territories.map(t=>({
+   name:t.name.length>12?t.name.slice(0,12)+"…":t.name,
+   value:t.actors
+ }));
+
+ const needs=[
+   {name:"Financiación",value:42},
+   {name:"Comercial.",value:35},
+   {name:"Gobernanza",value:29},
+   {name:"Medición",value:24}
+ ];
+
+ const caps=capitals.slice(0,6).map((c,i)=>({
+   name:c.replace("Capital ",""),
+   value:18+i*5
+ }));
+
+ const priorityTerritories=[
+   {
+     name:"Guasca",
+     reason:"Alta concentración de capital natural y oportunidades de articulación con empresas locales.",
+     score:"91%"
+   },
+   {
+     name:"Bogotá",
+     reason:"Mayor densidad institucional y potencial para pilotear mecanismos de coinversión.",
+     score:"88%"
+   },
+   {
+     name:"Montes de María",
+     reason:"Capital cultural fuerte, pero requiere mayor conexión con financiadores.",
+     score:"84%"
+   }
+ ];
+
+ return `
+ ${section(
+   "Centro de inteligencia territorial",
+   "¿Qué decisión quieres tomar hoy?",
+   "La Red Nacional de Datos del Ecosistema Social convierte información dispersa sobre actores, recursos, relaciones y capacidades territoriales en insumos prácticos para decidir dónde articular, dónde invertir y qué riesgos atender."
+ )}
+
+ <div class="decision-grid">
+   <div class="decision-card" onclick="setActive('Oportunidades')">
+     <div class="decision-icon">🤝</div>
+     <h3>Encontrar aliados</h3>
+     <p>
+       Identifica actores con recursos, capacidades o necesidades complementarias para activar colaboraciones territoriales.
+     </p>
+     <div class="decision-action">Explorar matching territorial →</div>
+   </div>
+
+   <div class="decision-card" onclick="setActive('Reportes')">
+     <div class="decision-icon">📍</div>
+     <h3>Priorizar inversión social</h3>
+     <p>
+       Reconoce territorios con capacidad de absorción, oportunidades de inversión y brechas donde los recursos pueden generar mayor valor.
+     </p>
+     <div class="decision-action">Ver inteligencia territorial →</div>
+   </div>
+
+   <div class="decision-card" onclick="setActive('Red de relaciones')">
+     <div class="decision-icon">🕸️</div>
+     <h3>Detectar fragmentación</h3>
+     <p>
+       Visualiza actores puente, conexiones intersectoriales, nodos aislados y riesgos de baja articulación en el ecosistema.
+     </p>
+     <div class="decision-action">Analizar capital relacional →</div>
+   </div>
+ </div>
+
+ <div class="grid stats">
+   ${stat("👥","Actores locales mapeados","367","Base territorial consolidada")}
+   ${stat("📍","Territorios en acción","10","Nodos activos de información")}
+   ${stat("🕸️","Conexiones identificadas","126","Relaciones de colaboración")}
+   ${stat("🤝","Oportunidades","34","Matches entre recursos y necesidades")}
+ </div>
+
+ <div class="grid stats">
+   ${stat("🏛️","Fundaciones vinculadas","8")}
+   ${stat("🌱","Recursos disponibles","82")}
+   ${stat("✅","Perfiles validados","72%")}
+   ${stat("🛡️","Confianza promedio","4.2/5")}
+ </div>
+
+ <div class="intelligence-strip">
+   <div class="card">
+     <h3 style="color:var(--blue);font-size:25px;margin:0 0 10px">Lectura rápida del ecosistema</h3>
+     <p style="color:#5f6b67;line-height:1.55;margin-top:0">
+       La plataforma identifica territorios con capacidades visibles, brechas de articulación y oportunidades para conectar actores que hoy operan en paralelo. Su valor no está en registrar datos, sino en activar decisiones de colaboración, fortalecimiento e inversión social.
+     </p>
+
+     <div class="grid three" style="margin-top:18px">
+       ${[
+         "Guasca y Barichara concentran alta presencia de capital natural y social.",
+         "Bogotá y Medellín muestran mayor densidad de conexiones intersectoriales.",
+         "Montes de María y Alto Putumayo requieren fortalecer articulación con financiadores."
+       ].map(i=>`
+         <div class="card insight" style="box-shadow:none">
+           <div class="spark">✦</div>
+           <p>${i}</p>
+         </div>
+       `).join("")}
+     </div>
+   </div>
+
+   <div class="card">
+     <h3 style="color:var(--blue);font-size:25px;margin:0 0 14px">Territorios priorizados</h3>
+     <div class="priority-list">
+       ${priorityTerritories.map(t=>`
+         <div class="priority-item">
+           <div>
+             <strong>${t.name}</strong>
+             <small>${t.reason}</small>
+           </div>
+           <div class="priority-score">${t.score}</div>
+         </div>
+       `).join("")}
+     </div>
+   </div>
+ </div>
+
+ <div class="grid two" style="margin-top:20px">
+   ${chartCard("Actores por tipo",byType)}
+   ${chartCard("Actores por territorio",byTerritory,"blue")}
+   ${chartCard("Capitales territoriales predominantes",caps,"earth")}
+   ${chartCard("Necesidades más frecuentes",needs)}
+ </div>`;
+}
  const byType=actorTypes.slice(0,6).map(t=>({name:t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad"),value:actors.filter(a=>a.tipo===t).length}));
  const byTerritory=territories.map(t=>({name:t.name.length>12?t.name.slice(0,12)+"…":t.name,value:t.actors}));
  const needs=[{name:"Financiación",value:42},{name:"Comercial.",value:35},{name:"Gobernanza",value:29},{name:"Medición",value:24}];
