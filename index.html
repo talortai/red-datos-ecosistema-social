@@ -127,8 +127,113 @@
     .profile{grid-template-columns:.8fr 1.2fr}
     .chips{display:flex;flex-wrap:wrap;gap:8px}
     .chip{background:var(--beige);border-radius:999px;padding:7px 10px;font-size:12px;color:#53605d}
-    .network{height:520px;background:#fbfaf7;border-radius:24px;width:100%}
-    .node-label{font-size:2.2px;fill:var(--blue)}
+.network-wrap{
+  height:560px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(168,184,138,.22), transparent 34%),
+    linear-gradient(135deg,#fbfaf7,#f7efe4);
+  border-radius:24px;
+  width:100%;
+  overflow:hidden;
+  border:1px solid var(--border);
+  position:relative;
+}
+
+.network{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.network-link{
+  fill:none;
+  stroke:#A8B88A;
+  stroke-width:2;
+  opacity:.36;
+}
+
+.network-link.strong{
+  stroke:#4F7C45;
+  stroke-width:3.2;
+  opacity:.55;
+}
+
+.network-node{
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.network-node circle{
+  stroke:white;
+  stroke-width:4;
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.18));
+}
+
+.network-node:hover circle{
+  transform:scale(1.08);
+}
+
+.network-node.selected circle{
+  stroke:var(--earth);
+  stroke-width:6;
+}
+
+.network-label{
+  font-size:12px;
+  fill:var(--blue);
+  font-weight:800;
+  paint-order:stroke;
+  stroke:#fff;
+  stroke-width:5px;
+  stroke-linejoin:round;
+}
+
+.network-subtitle{
+  font-size:10px;
+  fill:#6d7773;
+  paint-order:stroke;
+  stroke:#fff;
+  stroke-width:4px;
+}
+
+.network-center-label{
+  font-size:16px;
+  fill:var(--blue);
+  font-weight:900;
+  text-anchor:middle;
+}
+
+.network-center-small{
+  font-size:11px;
+  fill:#6d7773;
+  text-anchor:middle;
+}
+
+.network-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:12px;
+  color:#53605d;
+}
+
+.legend-dot{
+  width:11px;
+  height:11px;
+  border-radius:999px;
+  display:inline-block;
+}
     .opp{cursor:pointer}
     .opp.selected{outline:2px solid var(--sage)}
     .score{font-size:34px;color:var(--green);font-weight:900}
@@ -227,6 +332,7 @@ let active="Inicio";
 let selectedActor=actors[0];
 let selectedTerritory=territories[4];
 let selectedOpportunity=opportunities[0];
+let selectedNetworkNode=null;
 let mapFilters={
   territorio:"Todos",
   tipo:"Todos",
@@ -599,14 +705,211 @@ function viewPerfil(){
 function detailBlock(title,items){return `<div><h3 style="color:var(--blue);font-size:17px">${title}</h3>${chips(items)}</div>`}
 
 function viewRed(){
- const nodes=actors.slice(0,24).map((a,index)=>({id:a.id,label:a.nombre.split(" ").slice(0,3).join(" "),type:a.tipo,x:50+Math.cos(index/24*Math.PI*2)*(index%3===0?34:25),y:50+Math.sin(index/24*Math.PI*2)*(index%3===0?30:22),size:7+(a.conexionesActuales%8)}));
- const links=nodes.slice(0,23).map((n,i)=>({from:n.id,to:nodes[(i*5+3)%nodes.length].id,strength:1+(i%4)}));
- function color(type){if(type.includes("Fundación"))return "#4F7C45"; if(type.includes("Empresa")||type.includes("Emprendimiento"))return "#C77945"; if(type.includes("Institución"))return "#305C5A"; if(type.includes("Universidad"))return "#8A7A55"; if(type.includes("Cooperante"))return "#9B6F45"; return "#A8B88A";}
- return `${section("Análisis relacional","Red de relaciones, confianza y colaboración","La plataforma no solo identifica quién existe; también permite reconocer quién conecta, quién está aislado y dónde hay oportunidades para fortalecer el tejido social.")}
- <div class="grid stats">${stat("🕸️","Densidad de red","0.42")}${stat("👥","Actores puente","12")}${stat("🤝","Conexiones intersectoriales","48")}${stat("⚠️","Actores aislados","9")}</div>
+ const visibleActors=actors.slice(0,24);
+
+ const typeColors={
+   "Fundación Territorial":"#4F7C45",
+   "Empresa local":"#C77945",
+   "Emprendimiento local":"#C77945",
+   "Institución pública":"#305C5A",
+   "Universidad / centro de conocimiento":"#8A7A55",
+   "Cooperante / aliado filantrópico":"#9B6F45",
+   "Organización de la sociedad civil":"#A8B88A",
+   "Colectivo comunitario":"#7FAF99",
+   "Liderazgo individual":"#B68B5E"
+ };
+
+ function nodeColor(type){
+   return typeColors[type] || "#A8B88A";
+ }
+
+ function shortName(name){
+   return name
+     .replace("Fundación Territorial ","FT ")
+     .replace("Fundación ","Fund. ")
+     .replace("Asociación ","Asoc. ")
+     .replace("Universidad ","Univ. ")
+     .split(" ")
+     .slice(0,4)
+     .join(" ");
+ }
+
+ const clusterCenters={
+   "Fundación Territorial":{x:450,y:245},
+   "Organización de la sociedad civil":{x:250,y:170},
+   "Colectivo comunitario":{x:255,y:355},
+   "Empresa local":{x:655,y:170},
+   "Emprendimiento local":{x:660,y:350},
+   "Institución pública":{x:450,y:95},
+   "Universidad / centro de conocimiento":{x:450,y:430},
+   "Cooperante / aliado filantrópico":{x:735,y:260},
+   "Liderazgo individual":{x:165,y:260}
+ };
+
+ const nodes=visibleActors.map((a,i)=>{
+   const center=clusterCenters[a.tipo] || {x:450,y:260};
+   const angle=(i*137.5)%360*Math.PI/180;
+   const radius=28+(i%4)*17;
+
+   return {
+     ...a,
+     x:center.x+Math.cos(angle)*radius,
+     y:center.y+Math.sin(angle)*radius,
+     r:12+a.conexionesActuales*1.2,
+     centrality:Math.min(96,52+a.conexionesActuales*5+a.nivelConfianza*4)
+   };
+ });
+
+ const links=nodes.slice(0,26).map((n,i)=>{
+   const target=nodes[(i*5+3)%nodes.length];
+   return {
+     from:n,
+     to:target,
+     strength:1+(i%4),
+     type:i%3===0?"Colaboración activa":i%3===1?"Confianza previa":"Oportunidad sugerida"
+   };
+ });
+
+ const selected=selectedNetworkNode 
+   ? nodes.find(n=>n.id===selectedNetworkNode) || nodes[0]
+   : nodes.sort((a,b)=>b.centrality-a.centrality)[0];
+
+ selectedNetworkNode=selected.id;
+
+ const catalysts=[...nodes]
+   .sort((a,b)=>b.centrality-a.centrality)
+   .slice(0,5);
+
+ function curvePath(a,b,i){
+   const dx=b.x-a.x;
+   const dy=b.y-a.y;
+   const mx=(a.x+b.x)/2;
+   const my=(a.y+b.y)/2;
+   const curve=(i%2===0?1:-1)*28;
+   const cx=mx-dy/Math.sqrt(dx*dx+dy*dy || 1)*curve;
+   const cy=my+dx/Math.sqrt(dx*dx+dy*dy || 1)*curve;
+   return `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`;
+ }
+
+ const legendTypes=[
+   "Fundación Territorial",
+   "Organización de la sociedad civil",
+   "Empresa local",
+   "Institución pública",
+   "Universidad / centro de conocimiento",
+   "Cooperante / aliado filantrópico"
+ ];
+
+ return `
+ ${section(
+   "Análisis relacional",
+   "Red de relaciones, confianza y colaboración",
+   "Esta vista permite identificar actores puente, conexiones intersectoriales, vínculos de confianza y oportunidades para fortalecer el capital relacional del ecosistema."
+ )}
+
+ <div class="grid stats">
+   ${stat("🕸️","Densidad de red","0.42","Nivel estimado de conexión")}
+   ${stat("👥","Actores puente","12","Nodos con alta centralidad")}
+   ${stat("🤝","Conexiones intersectoriales","48","Relaciones entre actores distintos")}
+   ${stat("⚠️","Actores aislados","9","Requieren activación")}
+ </div>
+
  <div class="grid mapgrid">
- <div class="card"><svg viewBox="0 0 100 100" class="network">${links.map((l,i)=>{const f=nodes.find(n=>n.id===l.from),t=nodes.find(n=>n.id===l.to);return `<line x1="${f.x}" y1="${f.y}" x2="${t.x}" y2="${t.y}" stroke="#A8B88A" stroke-width="${.25+l.strength*.18}" opacity=".55"/>`}).join("")}${nodes.map(n=>`<g><circle cx="${n.x}" cy="${n.y}" r="${n.size/2.2}" fill="${color(n.type)}" opacity=".92"/><text x="${n.x}" y="${n.y+n.size/2+3}" text-anchor="middle" class="node-label">${n.label}</text></g>`).join("")}</svg></div>
- <div class="card"><h3 style="color:var(--blue);font-size:24px">Actores catalizadores</h3><p style="color:#66716d">Nodos con alta capacidad para conectar confianza, saberes y recursos.</p>${["Fundación Territorial Guasca Regenerativa","Fundación Barichara Regenerativa","Red Jóvenes del Río","Universidad Aliada del Territorio","Empresa Local de Economía Circular"].map((a,i)=>`<div class="info-row"><strong>${a}</strong><small>Centralidad estimada: ${88-i*6}%</small></div>`).join("")}</div>
+   <div class="card">
+     <div class="network-wrap">
+       <svg viewBox="0 0 900 540" class="network">
+         <defs>
+           <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+             <stop offset="0%" stop-color="#F3E6D3" stop-opacity="1"/>
+             <stop offset="100%" stop-color="#F3E6D3" stop-opacity="0"/>
+           </radialGradient>
+         </defs>
+
+         <circle cx="450" cy="260" r="115" fill="url(#centerGlow)"></circle>
+         <text x="450" y="252" class="network-center-label">Capital relacional</text>
+         <text x="450" y="274" class="network-center-small">confianza · recursos · articulación</text>
+
+         ${links.map((l,i)=>`
+           <path 
+             d="${curvePath(l.from,l.to,i)}" 
+             class="network-link ${l.strength>=3?"strong":""}">
+             <title>${l.type}: ${l.from.nombre} → ${l.to.nombre}</title>
+           </path>
+         `).join("")}
+
+         ${nodes.map((n,i)=>`
+           <g 
+             class="network-node ${selected.id===n.id?"selected":""}" 
+             onclick="selectedNetworkNode='${n.id}';render()">
+             <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${nodeColor(n.tipo)}"></circle>
+             <title>${n.nombre} · ${n.tipo} · ${n.territorio}</title>
+             ${n.centrality>=78 || selected.id===n.id ? `
+               <text x="${n.x}" y="${n.y+n.r+18}" text-anchor="middle" class="network-label">${shortName(n.nombre)}</text>
+               <text x="${n.x}" y="${n.y+n.r+33}" text-anchor="middle" class="network-subtitle">${n.territorio}</text>
+             ` : ""}
+           </g>
+         `).join("")}
+       </svg>
+     </div>
+
+     <div class="network-legend">
+       ${legendTypes.map(t=>`
+         <span class="legend-item">
+           <span class="legend-dot" style="background:${nodeColor(t)}"></span>
+           ${t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad")}
+         </span>
+       `).join("")}
+     </div>
+   </div>
+
+   <div class="card">
+     <p class="eyebrow">Actor seleccionado</p>
+     <h3 style="color:var(--blue);font-size:25px;margin:0 0 8px">${selected.nombre}</h3>
+     <p style="color:#66716d;line-height:1.5;margin-top:0">${selected.descripcion}</p>
+
+     ${info("Tipo de actor",selected.tipo)}
+     ${info("Territorio",selected.territorio)}
+     ${info("Capital principal",selected.capitalPrincipal)}
+     ${info("Nivel de confianza",selected.nivelConfianza+"/5")}
+     ${info("Conexiones actuales",selected.conexionesActuales)}
+     ${info("Centralidad estimada",selected.centrality+"%")}
+
+     <button class="btn" style="width:100%;margin-top:8px" onclick="selectedActor=actors.find(a=>a.id==='${selected.id}');setActive('Perfil de actor')">
+       Ver ficha del actor
+     </button>
+   </div>
+ </div>
+
+ <div class="grid two" style="margin-top:18px">
+   <div class="card">
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Actores catalizadores</h3>
+     <p style="color:#66716d;line-height:1.5">
+       Nodos con mayor capacidad para conectar confianza, saberes, recursos y oportunidades entre sectores.
+     </p>
+     ${catalysts.map(a=>`
+       <div class="info-row" onclick="selectedNetworkNode='${a.id}';render()" style="cursor:pointer">
+         <small>${a.tipo} · ${a.territorio}</small>
+         <strong>${a.nombre}</strong>
+         <div style="margin-top:8px">
+           ${badge("Centralidad "+a.centrality+"%")} 
+           ${badge("Confianza "+a.nivelConfianza+"/5")}
+         </div>
+       </div>
+     `).join("")}
+   </div>
+
+   <div class="card">
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Lectura estratégica</h3>
+     <p style="color:#5f6b67;line-height:1.55">
+       La red permite identificar qué actores conectan grupos distintos, dónde se concentran relaciones de confianza y qué vínculos podrían activarse para reducir fragmentación. Los nodos más grandes representan actores con mayor número de conexiones y mayor potencial de articulación.
+     </p>
+     <div class="grid two">
+       ${info("Relación más relevante","Confianza previa")}
+       ${info("Brecha prioritaria","Actores aislados")}
+       ${info("Acción sugerida","Mesa de articulación")}
+       ${info("Uso del dato","Activar matching")}
+     </div>
+   </div>
  </div>`;
 }
 
