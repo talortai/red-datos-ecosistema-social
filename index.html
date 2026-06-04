@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Nacional de Datos del Ecosistema Social</title>
-  <style>
+<title>Red Nacional de Datos del Ecosistema Social</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
     :root{
       --green:#4F7C45;
       --blue:#305C5A;
@@ -56,7 +59,53 @@
     .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
     input,select,textarea{border:1px solid var(--border);border-radius:14px;padding:11px 12px;background:#fff;color:#42504c;font-size:14px}
     .mapgrid{grid-template-columns:1.35fr .65fr}
-    .map{height:560px;border-radius:24px;background:linear-gradient(135deg,#E8E2C8,#FAF6EF,#DDE6D1);position:relative;overflow:hidden}
+    .real-map{
+  height:560px;
+  border-radius:24px;
+  overflow:hidden;
+  background:var(--beige);
+  border:1px solid var(--border);
+}
+
+.leaflet-container{
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+
+.territoria-marker-shell{
+  background:transparent;
+  border:0;
+}
+
+.territoria-div-marker{
+  width:38px;
+  height:38px;
+  border-radius:999px;
+  background:var(--green);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:13px;
+  border:3px solid white;
+  box-shadow:0 8px 22px rgba(0,0,0,.28);
+}
+
+.territoria-div-marker.filtered{
+  background:var(--earth);
+}
+
+.territoria-div-marker.selected{
+  background:var(--blue);
+  transform:scale(1.15);
+}
+
+.leaflet-tooltip{
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:0 8px 22px rgba(0,0,0,.14);
+  color:var(--ink);
+}
     .colombia{position:absolute;left:29%;top:8%;width:46%;height:82%;border:2px dashed rgba(127,175,153,.45);border-radius:45%;background:rgba(255,255,255,.28)}
     .pin{position:absolute;transform:translate(-50%,-50%);border:0;border-radius:15px;padding:9px 11px;background:#fff;color:var(--blue);box-shadow:0 8px 24px rgba(0,0,0,.12);cursor:pointer;text-align:left;min-width:112px}
     .pin.active{background:var(--green);color:white}
@@ -127,6 +176,11 @@
     </main>
   </div>
   <div id="toast" class="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const territories=[
 
 <script>
 const territories=[
@@ -253,6 +307,84 @@ function resetMapFilters(){
   };
   render();
 }
+  let territoriaMap=null;
+
+function initTerritorialMap(){
+  setTimeout(()=>{
+    const el=document.getElementById("territoriaMap");
+    if(!el) return;
+
+    if(typeof L==="undefined"){
+      el.innerHTML=`
+        <div style="padding:22px;color:#66716d">
+          No fue posible cargar el mapa. Revisa la conexión a internet o la carga de Leaflet.
+        </div>`;
+      return;
+    }
+
+    if(territoriaMap){
+      territoriaMap.remove();
+      territoriaMap=null;
+    }
+
+    const filtering=hasActiveMapFilters();
+    const matchInfo=territoryMatchInfo();
+    const visibleTerritories=filtering ? matchInfo.filter(t=>t.matchCount>0) : matchInfo;
+
+    territoriaMap=L.map("territoriaMap",{
+      scrollWheelZoom:false,
+      zoomControl:true
+    }).setView([4.5709,-74.2973],6);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+      maxZoom:18,
+      attribution:'&copy; OpenStreetMap contributors'
+    }).addTo(territoriaMap);
+
+    const bounds=[];
+
+    visibleTerritories.forEach(t=>{
+      if(typeof t.lat!=="number" || typeof t.lng!=="number") return;
+
+      const realIndex=territories.findIndex(x=>x.name===t.name);
+      const isSelected=selectedTerritory.name===t.name;
+      const markerValue=filtering ? t.matchCount : t.opportunities;
+
+      const marker=L.marker([t.lat,t.lng],{
+        icon:L.divIcon({
+          className:"territoria-marker-shell",
+          html:`<div class="territoria-div-marker ${filtering?"filtered":""} ${isSelected?"selected":""}">${markerValue}</div>`,
+          iconSize:[38,38],
+          iconAnchor:[19,19]
+        })
+      }).addTo(territoriaMap);
+
+      marker.bindTooltip(`
+        <strong>${t.name}</strong><br>
+        ${t.dept}<br>
+        ${filtering 
+          ? `${t.matchCount} coincidencia${t.matchCount===1?"":"s"} con los filtros`
+          : `${t.actors} actores · ${t.opportunities} oportunidades`
+        }
+      `);
+
+      marker.on("click",()=>{
+        selectedTerritory=territories[realIndex];
+        render();
+      });
+
+      bounds.push([t.lat,t.lng]);
+    });
+
+    if(bounds.length===1){
+      territoriaMap.setView(bounds[0],8);
+    }else if(bounds.length>1){
+      territoriaMap.fitBounds(bounds,{padding:[35,35]});
+    }
+
+    setTimeout(()=>territoriaMap.invalidateSize(),120);
+  },0);
+}
 const navItems=["Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes","Actualizar datos"];
 const icons={"Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️","Actualizar datos":"🔄"};
 
@@ -274,7 +406,10 @@ function render(){
  renderNav();
  const app=document.getElementById("app");
  if(active==="Inicio") app.innerHTML=viewInicio();
- if(active==="Mapa territorial") app.innerHTML=viewMapa();
+ if(active==="Mapa territorial"){
+  app.innerHTML=viewMapa();
+  initTerritorialMap();
+}
  if(active==="Directorio de actores") app.innerHTML=viewDirectorio();
  if(active==="Perfil de actor") app.innerHTML=viewPerfil();
  if(active==="Red de relaciones") app.innerHTML=viewRed();
@@ -370,8 +505,8 @@ function viewMapa(){
  return `
  ${section(
    "Mapa territorial",
-   "Nodos territoriales y capacidades visibles",
-   "Un mapa simplificado permite identificar concentración de actores, capitales predominantes y oportunidades de articulación por territorio. Los filtros permiten explorar dónde se concentran ciertos tipos de actores, capitales, temas, niveles de confianza y capacidades de absorción."
+   "Cartografía viva del ecosistema",
+   "Este mapa permite ubicar territorialmente los nodos del ecosistema social y explorar dónde se concentran actores, capitales, temas, niveles de confianza y capacidades de absorción."
  )}
  ${filterControls()}
 
@@ -385,30 +520,7 @@ function viewMapa(){
 
  <div class="grid mapgrid">
    <div class="card">
-     <div class="map">
-       <div class="colombia"></div>
-
-       ${visibleTerritories.length ? visibleTerritories.map(t=>{
-         const realIndex=territories.findIndex(x=>x.name===t.name);
-         return `
-         <button 
-           class="pin ${selectedTerritory.name===t.name?"active":""}" 
-           style="left:${t.x}%;top:${t.y}%"
-           onclick="selectedTerritory=territories[${realIndex}];render()">
-           <strong>📍 ${t.name}</strong>
-           <span>
-             ${filtering 
-               ? `${t.matchCount} coincidencia${t.matchCount===1?"":"s"}`
-               : `${t.actors} actores · ${t.opportunities} oportunidades`
-             }
-           </span>
-         </button>`;
-       }).join("") : `
-       <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:white;border:1px solid var(--border);border-radius:20px;padding:18px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08);max-width:320px">
-         <strong style="color:var(--blue)">No hay coincidencias</strong>
-         <p style="color:#66716d;margin-bottom:0">Prueba limpiar los filtros o ampliar los criterios de búsqueda.</p>
-       </div>`}
-     </div>
+     <div id="territoriaMap" class="real-map"></div>
    </div>
 
    <div class="card">
@@ -432,10 +544,16 @@ function viewMapa(){
          <div class="info-row">
            <small>${a.tipo}</small>
            <strong>${a.nombre}</strong>
-           <div style="margin-top:8px">${badge(a.capitalPrincipal)} ${badge("Confianza "+a.nivelConfianza+"/5")} ${badge("Absorción "+a.capacidadAbsorcion)}</div>
+           <div style="margin-top:8px">
+             ${badge(a.capitalPrincipal)} 
+             ${badge("Confianza "+a.nivelConfianza+"/5")} 
+             ${badge("Absorción "+a.capacidadAbsorcion)}
+           </div>
          </div>
        `).join("") : `
-         <p style="color:#66716d;line-height:1.5">Este territorio no tiene actores que coincidan con los filtros seleccionados.</p>
+         <p style="color:#66716d;line-height:1.5">
+           Este territorio no tiene actores que coincidan con los filtros seleccionados.
+         </p>
        `}
      </div>` : `
      <div style="background:var(--beige);border-radius:18px;padding:16px;margin-top:18px">
