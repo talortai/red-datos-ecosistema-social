@@ -365,6 +365,66 @@ body:not(.logged-out) .login-screen{
   font-size:12px;
   font-weight:800;
 }
+.profile-photo{
+  width:116px;
+  height:116px;
+  border-radius:32px;
+  background:var(--beige);
+  border:1px solid var(--border);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  color:var(--green);
+  font-size:42px;
+  font-weight:900;
+  margin-bottom:16px;
+}
+
+.profile-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.profile-edit-form{
+  display:grid;
+  gap:12px;
+}
+
+.profile-edit-form label{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  color:#66716d;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  margin-bottom:6px;
+}
+
+.profile-edit-form input,
+.profile-edit-form textarea{
+  width:100%;
+}
+
+.profile-edit-form textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.profile-photo-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0 18px;
+}
+
+.profile-help{
+  font-size:12px;
+  color:#66716d;
+  line-height:1.45;
+  margin-top:8px;
+}
 
 @media(max-width:850px){
   .login-card{
@@ -521,7 +581,8 @@ let selectedActor=actors[0];
 let selectedTerritory=territories[4];
 let selectedOpportunity=opportunities[0];
 let selectedNetworkNode=null;
-  let currentUser=null;
+let currentUser=null;
+let currentProfileKey=null;
 
 const userProfiles={
   territoria:{
@@ -552,7 +613,88 @@ const userProfiles={
     acciones:["Explorar oportunidades de articulación","Revisar territorios priorizados","Identificar actores con alta confianza","Solicitar contacto con un nodo territorial"]
   }
 };
+function loadProfileData(key){
+  try{
+    const saved=localStorage.getItem("territoriaProfile_"+key);
 
+    if(saved){
+      userProfiles[key]={
+        ...userProfiles[key],
+        ...JSON.parse(saved)
+      };
+    }
+  }catch(e){
+    console.warn("No se pudo cargar el perfil guardado",e);
+  }
+
+  return userProfiles[key];
+}
+
+function persistProfileData(){
+  if(!currentProfileKey || !currentUser) return;
+
+  try{
+    localStorage.setItem("territoriaProfile_"+currentProfileKey,JSON.stringify(currentUser));
+  }catch(e){
+    toast("No fue posible guardar. La imagen puede ser muy pesada.");
+  }
+}
+
+function saveProfileEdits(){
+  if(!currentUser) return;
+
+  const nombre=document.getElementById("editNombre")?.value.trim();
+  const rol=document.getElementById("editRol")?.value.trim();
+  const organizacion=document.getElementById("editOrganizacion")?.value.trim();
+  const descripcion=document.getElementById("editDescripcion")?.value.trim();
+
+  currentUser.nombre=nombre || currentUser.nombre;
+  currentUser.rol=rol || currentUser.rol;
+  currentUser.organizacion=organizacion || currentUser.organizacion;
+  currentUser.descripcion=descripcion || currentUser.descripcion;
+
+  persistProfileData();
+  render();
+  toast("Perfil actualizado correctamente.");
+}
+
+function handleProfilePhoto(input){
+  const file=input.files && input.files[0];
+
+  if(!file) return;
+
+  if(!file.type.startsWith("image/")){
+    toast("Selecciona una imagen válida.");
+    input.value="";
+    return;
+  }
+
+  if(file.size>900000){
+    toast("La imagen es muy pesada. Usa una foto menor a 900 KB.");
+    input.value="";
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=function(){
+    currentUser.foto=reader.result;
+    persistProfileData();
+    render();
+    toast("Foto actualizada correctamente.");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function removeProfilePhoto(){
+  if(!currentUser) return;
+
+  currentUser.foto="";
+  persistProfileData();
+  render();
+  toast("Foto eliminada del perfil.");
+}
 function fillDemoLogin(){
   document.getElementById("loginPassword").value="demo123";
 }
@@ -567,7 +709,9 @@ function loginDemo(){
     return;
   }
 
-  currentUser=userProfiles[user];
+  currentProfileKey=user;
+  currentUser=loadProfileData(user);
+
   error.textContent="";
   document.body.classList.remove("logged-out");
   active="Mi perfil";
@@ -577,6 +721,7 @@ function loginDemo(){
 
 function logoutDemo(){
   currentUser=null;
+  currentProfileKey=null;
   document.body.classList.add("logged-out");
   active="Inicio";
   document.getElementById("loginPassword").value="";
@@ -745,6 +890,13 @@ function toast(msg){const el=document.getElementById("toast");el.textContent=msg
 function badge(v){let cls="badge"; if(["Pendiente","Sugerida"].includes(v)) cls+=" info"; if(["Media","Medio","En proceso","En contacto"].includes(v)) cls+=" warn"; return `<span class="${cls}">${v}</span>`}
 function chips(arr){return `<div class="chips">${arr.map(x=>`<span class="chip">${x}</span>`).join("")}</div>`}
 function info(label,value){return `<div class="info-row"><small>${label}</small><strong>${value}</strong></div>`}
+function safeAttr(value){
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/"/g,"&quot;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
 function section(eyebrow,title,text){return `<p class="eyebrow">${eyebrow}</p><h3 class="title">${title}</h3>${text?`<p class="lead">${text}</p>`:""}`}
 function stat(icon,label,value,note=""){return `<div class="card stat"><div><p>${label}</p><h3>${value}</h3>${note?`<p style="font-size:12px;margin-top:4px">${note}</p>`:""}</div><div class="icon">${icon}</div></div>`}
 function chartCard(title,data,color="green"){const max=Math.max(...data.map(d=>d.value));return `<div class="card"><h3 style="color:var(--blue);margin:0 0 14px">${title}</h3><div class="chart">${data.map(d=>`<div class="barwrap"><div class="bar ${color}" style="height:${Math.max(12,d.value/max*170)}px"></div><div class="barlabel">${d.name}</div></div>`).join("")}</div></div>`}
@@ -773,12 +925,13 @@ function render(){
 
 function viewMiPerfil(){
  const u=currentUser || userProfiles.territoria;
+ const badgeEl=document.getElementById("userBadge");
 
-const badgeEl=document.getElementById("userBadge");
+ if(badgeEl){
+   badgeEl.textContent=u.nombre;
+ }
 
-if(badgeEl){
-  badgeEl.textContent=u.nombre;
-}
+ const initial=(u.nombre || "T").trim().slice(0,1).toUpperCase();
 
  return `
  ${section("Perfil institucional",u.nombre,"Consulta rápida del usuario activo, sus permisos, información de interés y acciones sugeridas dentro de la plataforma.")}
@@ -792,8 +945,34 @@ if(badgeEl){
 
  <div class="grid profile" style="margin-top:18px">
    <div class="card">
-     <div class="logo" style="margin-bottom:18px">T</div>
-     <p class="eyebrow">Usuario activo</p>
+     <div class="profile-photo">
+       ${u.foto ? `<img src="${u.foto}" alt="Foto de perfil">` : `<span>${initial}</span>`}
+     </div>
+
+     <div class="profile-photo-actions">
+       <label class="btn outline" for="profilePhotoInput" style="cursor:pointer">
+         Subir foto
+       </label>
+
+       <input 
+         id="profilePhotoInput" 
+         type="file" 
+         accept="image/*" 
+         onchange="handleProfilePhoto(this)" 
+         style="display:none"
+       >
+
+       ${u.foto ? `
+       <button class="btn outline" onclick="removeProfilePhoto()">
+         Quitar foto
+       </button>` : ""}
+     </div>
+
+     <p class="profile-help">
+       La foto se guarda solo en este navegador para efectos de demostración. Usa imágenes livianas, preferiblemente menores a 900 KB.
+     </p>
+
+     <p class="eyebrow" style="margin-top:20px">Usuario activo</p>
      <h3 style="font-size:30px;color:var(--blue);margin:0">${u.nombre}</h3>
      <p style="color:#5f6b67;line-height:1.55">${u.descripcion}</p>
 
@@ -803,6 +982,39 @@ if(badgeEl){
    </div>
 
    <div class="grid two">
+     <div class="card">
+       <h3 style="color:var(--blue);font-size:22px;margin-top:0">Editar información personal</h3>
+       <p style="color:#66716d;line-height:1.5">
+         Actualiza los datos visibles del perfil. En esta demo, los cambios quedan guardados en el navegador.
+       </p>
+
+       <div class="profile-edit-form">
+         <div>
+           <label>Nombre visible</label>
+           <input id="editNombre" value="${safeAttr(u.nombre)}">
+         </div>
+
+         <div>
+           <label>Rol</label>
+           <input id="editRol" value="${safeAttr(u.rol)}">
+         </div>
+
+         <div>
+           <label>Organización</label>
+           <input id="editOrganizacion" value="${safeAttr(u.organizacion)}">
+         </div>
+
+         <div>
+           <label>Descripción del perfil</label>
+           <textarea id="editDescripcion">${safeAttr(u.descripcion)}</textarea>
+         </div>
+
+         <button class="btn" onclick="saveProfileEdits()">
+           Guardar cambios
+         </button>
+       </div>
+     </div>
+
      <div class="card">
        <h3 style="color:var(--blue);font-size:22px;margin-top:0">Información de interés</h3>
        <p style="color:#66716d;line-height:1.5">
