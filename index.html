@@ -774,7 +774,11 @@ function render(){
 function viewMiPerfil(){
  const u=currentUser || userProfiles.territoria;
 
- document.getElementById("userBadge").textContent=u.nombre;
+const badgeEl=document.getElementById("userBadge");
+
+if(badgeEl){
+  badgeEl.textContent=u.nombre;
+}
 
  return `
  ${section("Perfil institucional",u.nombre,"Consulta rápida del usuario activo, sus permisos, información de interés y acciones sugeridas dentro de la plataforma.")}
@@ -837,6 +841,8 @@ function viewMiPerfil(){
    </div>
  </div>`;
 }
+
+function viewInicio(){
  const byType=actorTypes.slice(0,6).map(t=>({name:t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad"),value:actors.filter(a=>a.tipo===t).length}));
  const byTerritory=territories.map(t=>({name:t.name.length>12?t.name.slice(0,12)+"…":t.name,value:t.actors}));
  const needs=[{name:"Financiación",value:42},{name:"Comercial.",value:35},{name:"Gobernanza",value:29},{name:"Medición",value:24}];
