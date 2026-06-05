@@ -243,6 +243,143 @@
     .toast{position:fixed;right:24px;bottom:24px;background:var(--green);color:white;border-radius:18px;padding:14px 18px;box-shadow:0 12px 30px rgba(0,0,0,.22);display:none;z-index:20}
     .toast.show{display:block}
     .mobile-warning{display:none;background:var(--beige);padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px}
+  body.logged-out .layout,
+body.logged-out .mobile-warning{
+  display:none;
+}
+
+body:not(.logged-out) .login-screen{
+  display:none;
+}
+
+.login-screen{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:32px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(168,184,138,.35), transparent 32%),
+    radial-gradient(circle at 80% 75%, rgba(199,121,69,.22), transparent 34%),
+    linear-gradient(135deg,#FAF6EF,#F3E6D3);
+}
+
+.login-card{
+  width:min(980px,100%);
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:30px;
+  overflow:hidden;
+  box-shadow:0 18px 55px rgba(0,0,0,.13);
+}
+
+.login-left{
+  padding:42px;
+  background:
+    linear-gradient(135deg,rgba(79,124,69,.12),rgba(48,92,90,.08)),
+    #fbfaf7;
+}
+
+.login-left h1{
+  color:var(--blue);
+  font-size:36px;
+  line-height:1.05;
+  margin:0 0 16px;
+}
+
+.login-left p{
+  color:#5f6b67;
+  line-height:1.55;
+  max-width:520px;
+}
+
+.login-highlight{
+  margin-top:28px;
+  background:var(--beige);
+  border-radius:20px;
+  padding:18px;
+  color:#59625f;
+}
+
+.login-highlight strong{
+  display:block;
+  color:var(--green);
+  margin-bottom:6px;
+}
+
+.login-highlight span{
+  font-size:13px;
+}
+
+.login-right{
+  padding:42px;
+}
+
+.login-right h2{
+  color:var(--blue);
+  font-size:28px;
+  margin:0 0 8px;
+}
+
+.login-right p{
+  color:#66716d;
+  line-height:1.45;
+  margin-bottom:22px;
+}
+
+.login-right label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  color:#66716d;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin:14px 0 7px;
+}
+
+.login-right input,
+.login-right select{
+  width:100%;
+}
+
+.login-right small{
+  display:block;
+  color:#6d7773;
+  margin-top:16px;
+  line-height:1.4;
+}
+
+.login-error{
+  color:#9b3d2f;
+  font-size:13px;
+  margin-top:10px;
+  min-height:18px;
+}
+
+.user-badge{
+  background:var(--beige);
+  color:var(--blue);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:800;
+}
+
+@media(max-width:850px){
+  .login-card{
+    grid-template-columns:1fr;
+  }
+
+  .login-left,
+  .login-right{
+    padding:28px;
+  }
+
+  .login-left h1{
+    font-size:30px;
+  }
+}
     @media(max-width:1050px){
       aside{position:static;width:100%;height:auto}
       .layout{display:block}
@@ -255,7 +392,54 @@
     }
   </style>
 </head>
-<body>
+<body class="logged-out">
+  <section id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-left">
+      <div class="logo" style="margin-bottom:18px">T</div>
+      <p class="eyebrow">Acceso institucional</p>
+      <h1>Red Nacional de Datos del Ecosistema Social</h1>
+      <p>
+        Ingresa para consultar el perfil institucional, información de interés,
+        alertas territoriales y acciones sugeridas según el tipo de usuario.
+      </p>
+
+      <div class="login-highlight">
+        <strong>Demo TerritoriA</strong>
+        <span>Datos simulados para fines de presentación.</span>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <h2>Iniciar sesión</h2>
+      <p>Selecciona un perfil de prueba para entrar al prototipo.</p>
+
+      <label>Tipo de usuario</label>
+      <select id="loginUser">
+        <option value="territoria">TerritoriA</option>
+        <option value="fundacion">Fundación Territorial</option>
+        <option value="aliado">Aliado / Cooperante</option>
+      </select>
+
+      <label>Contraseña</label>
+      <input id="loginPassword" type="password" placeholder="Escribe: demo123">
+
+      <div id="loginError" class="login-error"></div>
+
+      <button class="btn" style="width:100%;margin-top:14px" onclick="loginDemo()">
+        Entrar al perfil
+      </button>
+
+      <button class="btn outline" style="width:100%;margin-top:10px" onclick="fillDemoLogin()">
+        Usar acceso demo
+      </button>
+
+      <small>
+        Usuario demo: cualquier perfil seleccionado · Contraseña: <strong>demo123</strong>
+      </small>
+    </div>
+  </div>
+</section>
   <div class="mobile-warning">Prototipo optimizado para computador. En celular se muestra en formato adaptado.</div>
   <div class="layout">
     <aside>
@@ -275,7 +459,11 @@
           <small>TerritoriA | Ecosistema Social</small>
           <h2 id="pageTitle">Inicio</h2>
         </div>
-        <button class="btn" onclick="toast('Reporte demo generado correctamente.')">Descargar demo</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+  <span id="userBadge" class="user-badge">Perfil demo</span>
+  <button class="btn" onclick="toast('Reporte demo generado correctamente.')">Descargar demo</button>
+  <button class="btn outline" onclick="logoutDemo()">Salir</button>
+</div>
       </header>
       <section class="content" id="app"></section>
     </main>
@@ -333,6 +521,67 @@ let selectedActor=actors[0];
 let selectedTerritory=territories[4];
 let selectedOpportunity=opportunities[0];
 let selectedNetworkNode=null;
+  let currentUser=null;
+
+const userProfiles={
+  territoria:{
+    nombre:"TerritoriA",
+    rol:"Administrador del ecosistema",
+    organizacion:"Red Nacional de Datos del Ecosistema Social",
+    descripcion:"Perfil institucional encargado de visualizar la información consolidada del ecosistema, identificar oportunidades de articulación y generar reportes territoriales para la toma de decisiones.",
+    intereses:["Mapa nacional de actores","Alertas territoriales","Oportunidades de articulación","Reportes estratégicos","Seguimiento a Fundaciones Territoriales"],
+    permisos:["Consulta nacional","Visualización de red","Generación de reportes","Revisión de oportunidades","Gestión de datos demo"],
+    acciones:["Revisar territorios con baja articulación","Priorizar actores puente","Generar reporte de oportunidades","Actualizar datos estratégicos"]
+  },
+  fundacion:{
+    nombre:"Fundación Territorial",
+    rol:"Nodo territorial",
+    organizacion:"Fundación Territorial vinculada",
+    descripcion:"Perfil orientado a consultar actores del territorio, actualizar información local, identificar necesidades del ecosistema y activar oportunidades de colaboración con otros actores.",
+    intereses:["Actores locales","Necesidades del territorio","Recursos disponibles","Conexiones comunitarias","Actualización de información"],
+    permisos:["Consulta territorial","Actualización de datos","Revisión de oportunidades locales","Visualización de actores relacionados"],
+    acciones:["Actualizar perfil territorial","Identificar aliados cercanos","Revisar necesidades priorizadas","Sugerir nuevas conexiones"]
+  },
+  aliado:{
+    nombre:"Aliado / Cooperante",
+    rol:"Actor de apoyo estratégico",
+    organizacion:"Aliado del ecosistema social",
+    descripcion:"Perfil diseñado para consultar oportunidades de inversión social, territorios priorizados, necesidades identificadas y posibles conexiones con actores locales.",
+    intereses:["Oportunidades de inversión social","Territorios priorizados","Necesidades frecuentes","Capitales territoriales","Matching con actores locales"],
+    permisos:["Consulta de oportunidades","Consulta de reportes agregados","Visualización de actores estratégicos"],
+    acciones:["Explorar oportunidades de articulación","Revisar territorios priorizados","Identificar actores con alta confianza","Solicitar contacto con un nodo territorial"]
+  }
+};
+
+function fillDemoLogin(){
+  document.getElementById("loginPassword").value="demo123";
+}
+
+function loginDemo(){
+  const user=document.getElementById("loginUser").value;
+  const password=document.getElementById("loginPassword").value;
+  const error=document.getElementById("loginError");
+
+  if(password!=="demo123"){
+    error.textContent="Contraseña incorrecta. Usa la contraseña demo123.";
+    return;
+  }
+
+  currentUser=userProfiles[user];
+  error.textContent="";
+  document.body.classList.remove("logged-out");
+  active="Mi perfil";
+  render();
+  toast("Sesión iniciada correctamente.");
+}
+
+function logoutDemo(){
+  currentUser=null;
+  document.body.classList.add("logged-out");
+  active="Inicio";
+  document.getElementById("loginPassword").value="";
+  render();
+}
 let mapFilters={
   territorio:"Todos",
   tipo:"Todos",
@@ -488,8 +737,8 @@ function initTerritorialMap(){
     setTimeout(()=>territoriaMap.invalidateSize(),120);
   },0);
 }
-const navItems=["Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes","Actualizar datos"];
-const icons={"Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️","Actualizar datos":"🔄"};
+const navItems=["Mi perfil","Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes","Actualizar datos"];
+const icons={"Mi perfil":"🏢","Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️","Actualizar datos":"🔄"};
 
 function setActive(page){active=page;render();}
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2600)}
@@ -508,6 +757,7 @@ function renderNav(){
 function render(){
  renderNav();
  const app=document.getElementById("app");
+ if(active==="Mi perfil") app.innerHTML=viewMiPerfil();
  if(active==="Inicio") app.innerHTML=viewInicio();
  if(active==="Mapa territorial"){
   app.innerHTML=viewMapa();
@@ -521,7 +771,72 @@ function render(){
  if(active==="Actualizar datos") app.innerHTML=viewActualizar();
 }
 
-function viewInicio(){
+function viewMiPerfil(){
+ const u=currentUser || userProfiles.territoria;
+
+ document.getElementById("userBadge").textContent=u.nombre;
+
+ return `
+ ${section("Perfil institucional",u.nombre,"Consulta rápida del usuario activo, sus permisos, información de interés y acciones sugeridas dentro de la plataforma.")}
+
+ <div class="grid stats">
+   ${stat("🏢","Tipo de perfil",u.rol)}
+   ${stat("📍","Territorios visibles",u.nombre==="TerritoriA"?"10":"Según permisos")}
+   ${stat("🕸️","Acceso a red",u.permisos.includes("Visualización de red") || u.permisos.includes("Consulta territorial") ? "Activo" : "Limitado")}
+   ${stat("🗂️","Reportes",u.permisos.includes("Generación de reportes") ? "Completo" : "Agregado")}
+ </div>
+
+ <div class="grid profile" style="margin-top:18px">
+   <div class="card">
+     <div class="logo" style="margin-bottom:18px">T</div>
+     <p class="eyebrow">Usuario activo</p>
+     <h3 style="font-size:30px;color:var(--blue);margin:0">${u.nombre}</h3>
+     <p style="color:#5f6b67;line-height:1.55">${u.descripcion}</p>
+
+     ${info("Rol",u.rol)}
+     ${info("Organización",u.organizacion)}
+     ${info("Estado",badge("Activo"))}
+   </div>
+
+   <div class="grid two">
+     <div class="card">
+       <h3 style="color:var(--blue);font-size:22px;margin-top:0">Información de interés</h3>
+       <p style="color:#66716d;line-height:1.5">
+         Temas priorizados para este perfil dentro del ecosistema.
+       </p>
+       ${chips(u.intereses)}
+     </div>
+
+     <div class="card">
+       <h3 style="color:var(--blue);font-size:22px;margin-top:0">Permisos del perfil</h3>
+       <p style="color:#66716d;line-height:1.5">
+         Funciones habilitadas en esta versión demostrativa.
+       </p>
+       ${chips(u.permisos)}
+     </div>
+
+     <div class="card">
+       <h3 style="color:var(--blue);font-size:22px;margin-top:0">Acciones recomendadas</h3>
+       ${u.acciones.map(a=>`
+         <div class="info-row">
+           <small>Acción sugerida</small>
+           <strong>${a}</strong>
+         </div>
+       `).join("")}
+     </div>
+
+     <div class="card">
+       <h3 style="color:var(--blue);font-size:22px;margin-top:0">Accesos rápidos</h3>
+       <div class="grid" style="gap:10px">
+         <button class="btn" onclick="setActive('Mapa territorial')">Ver mapa territorial</button>
+         <button class="btn outline" onclick="setActive('Red de relaciones')">Explorar red de relaciones</button>
+         <button class="btn outline" onclick="setActive('Oportunidades')">Revisar oportunidades</button>
+         <button class="btn outline" onclick="setActive('Reportes')">Consultar reportes</button>
+       </div>
+     </div>
+   </div>
+ </div>`;
+}
  const byType=actorTypes.slice(0,6).map(t=>({name:t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad"),value:actors.filter(a=>a.tipo===t).length}));
  const byTerritory=territories.map(t=>({name:t.name.length>12?t.name.slice(0,12)+"…":t.name,value:t.actors}));
  const needs=[{name:"Financiación",value:42},{name:"Comercial.",value:35},{name:"Gobernanza",value:29},{name:"Medición",value:24}];
