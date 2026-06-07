@@ -426,6 +426,88 @@ body:not(.logged-out) .login-screen{
   margin-top:8px;
 }
 
+.inline-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+.initiative-list{
+  display:grid;
+  gap:12px;
+}
+
+.initiative-card{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:14px;
+  background:#fbfaf7;
+}
+
+.initiative-card h4{
+  color:var(--blue);
+  margin:0 0 6px;
+  font-size:16px;
+}
+
+.initiative-card p{
+  color:#5f6b67;
+  line-height:1.45;
+  margin:8px 0 0;
+  font-size:13px;
+}
+
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(38,51,45,.42);
+  z-index:30;
+}
+
+.modal-backdrop.show{
+  display:flex;
+}
+
+.message-modal{
+  width:min(760px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:22px;
+  box-shadow:0 22px 70px rgba(0,0,0,.28);
+  padding:22px;
+}
+
+.message-modal textarea{
+  min-height:130px;
+  resize:vertical;
+}
+
+.message-history{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+
+.message-bubble{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  background:#fbfaf7;
+}
+
+.message-bubble small{
+  display:block;
+  color:#6d7773;
+  margin-bottom:5px;
+}
+
 @media(max-width:850px){
   .login-card{
     grid-template-columns:1fr;
@@ -528,6 +610,7 @@ body:not(.logged-out) .login-screen{
       <section class="content" id="app"></section>
     </main>
   </div>
+  <div id="messageModal" class="modal-backdrop" onclick="if(event.target===this) closeMessageModal()"></div>
   <div id="toast" class="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -564,7 +647,34 @@ const actors=Array.from({length:58},(_,i)=>{
   necesidades:[["Fortalecimiento administrativo","Financiación semilla"],["Comercialización","Diseño de marca"],["Gobernanza","Medición de impacto"],["Alianzas empresariales","Mentoría financiera"]][i%4],
   nivelConfianza:3+(i%3),capacidadAbsorcion:["Baja","Media","Alta"][i%3],nivelArticulacion:["Bajo","Medio","Alto"][i%3],
   fundacionTerritorialRelacionada:territory.ft,estadoPerfil:["Validado","Pendiente","Desactualizado","Validado"][i%4],
-  conexionesActuales:2+(i%9),oportunidadesSugeridas:1+(i%5)
+  conexionesActuales:2+(i%9),oportunidadesSugeridas:1+(i%5),
+  ultimaActualizacion:["Hace 12 dias","Hace 1 mes","Hace 2 meses","Requiere validacion"][i%4],
+  indicadores:{
+    beneficiarios:120+(i%8)*65,
+    cobertura:["Veredal","Municipal","Subregional","Departamental"][i%4],
+    avance:[35,48,62,74,86][i%5]+"%",
+    presupuesto:["Por estimar","COP 45M","COP 120M","Aporte en especie"][i%4]
+  },
+  iniciativas:[
+    {
+      nombre:["Escuela de liderazgos locales","Mesa de agua y territorio","Ruta de economia local","Laboratorio cultural comunitario"][i%4],
+      estado:["En diseno","Activa","En busqueda de aliados","En consolidacion"][i%4],
+      alcance:["20 liderazgos formados","3 veredas articuladas","12 unidades productivas","Agenda cultural trimestral"][i%4],
+      descripcion:["Fortalece capacidades de gestion, confianza y coordinacion entre actores del territorio.","Conecta organizaciones comunitarias para priorizar necesidades hidricas y ambientales.","Acompana emprendimientos locales para mejorar comercializacion y acceso a compradores.","Visibiliza saberes, memoria local y practicas culturales con potencial de articulacion."][i%4]
+    },
+    {
+      nombre:["Banco de recursos comunitarios","Red de voluntariado especializado","Sistema local de alertas","Encuentro intersectorial"][i%4],
+      estado:["Piloto","Activa","Planeada","En seguimiento"][i%4],
+      alcance:["Mapa de recursos disponibles","Mentorias tecnicas mensuales","Priorizacion de brechas","Acuerdos de colaboracion"][i%4],
+      descripcion:["Ordena capacidades, espacios, equipos y contactos que pueden compartirse entre organizaciones.","Conecta necesidades especificas con profesionales, universidades y empresas aliadas.","Permite reportar cambios en necesidades, riesgos y oportunidades del ecosistema.","Crea un espacio periodico para activar confianza y compromisos entre sectores."][i%4]
+    }
+  ],
+  datosRelevantes:[
+    "Requiere acompanamiento para sostener informacion actualizada.",
+    "Tiene potencial para conectar recursos disponibles con necesidades territoriales.",
+    "Puede actuar como nodo puente si se fortalece la confianza intersectorial."
+  ],
+  observaciones:["Sin alertas criticas","Necesita validacion documental","Alta oportunidad de cofinanciacion","Requiere articulacion con empresas locales"][i%4]
  }
 });
 
@@ -583,6 +693,8 @@ let selectedOpportunity=opportunities[0];
 let selectedNetworkNode=null;
 let currentUser=null;
 let currentProfileKey=null;
+let messageActorIndex=0;
+let directMessages=loadDirectMessages();
 
 const userProfiles={
   territoria:{
@@ -592,7 +704,7 @@ const userProfiles={
     descripcion:"Perfil institucional encargado de visualizar la información consolidada del ecosistema, identificar oportunidades de articulación y generar reportes territoriales para la toma de decisiones.",
     intereses:["Mapa nacional de actores","Alertas territoriales","Oportunidades de articulación","Reportes estratégicos","Seguimiento a Fundaciones Territoriales"],
     permisos:["Consulta nacional","Visualización de red","Generación de reportes","Revisión de oportunidades","Gestión de datos demo"],
-    acciones:["Revisar territorios con baja articulación","Priorizar actores puente","Generar reporte de oportunidades","Actualizar datos estratégicos"]
+    acciones:["Revisar territorios con baja articulación","Priorizar actores puente","Generar reporte de oportunidades","Validar informacion desde perfiles"]
   },
   fundacion:{
     nombre:"Fundación Territorial",
@@ -638,6 +750,153 @@ function persistProfileData(){
   }catch(e){
     toast("No fue posible guardar. La imagen puede ser muy pesada.");
   }
+}
+
+function loadDirectMessages(){
+  try{
+    return JSON.parse(localStorage.getItem("territoriaDirectMessages") || "[]");
+  }catch(e){
+    return [];
+  }
+}
+
+function persistDirectMessages(){
+  try{
+    localStorage.setItem("territoriaDirectMessages",JSON.stringify(directMessages));
+  }catch(e){
+    toast("No fue posible guardar el mensaje en esta demo.");
+  }
+}
+
+function actorIndexByName(name){
+  return actors.findIndex(a=>a.nombre===name || a.nombre.startsWith(name) || name.startsWith(a.nombre));
+}
+
+function openMessageByName(name){
+  const index=actorIndexByName(name);
+  if(index<0){
+    toast("No se encontro una organizacion asociada en el directorio demo.");
+    return;
+  }
+  openMessageModal(index);
+}
+
+function openMessageModal(index){
+  if(index<0 || !actors[index]){
+    toast("No se encontro la organizacion seleccionada.");
+    return;
+  }
+
+  messageActorIndex=index;
+  renderMessageModal();
+}
+
+function closeMessageModal(){
+  const modal=document.getElementById("messageModal");
+  if(!modal) return;
+  modal.classList.remove("show");
+  modal.innerHTML="";
+}
+
+function sendDirectMessage(){
+  const actor=actors[messageActorIndex];
+  if(!actor) return;
+
+  const subject=document.getElementById("messageSubject")?.value.trim();
+  const body=document.getElementById("messageBody")?.value.trim();
+
+  if(!subject || !body){
+    toast("Completa el asunto y el mensaje antes de enviar.");
+    return;
+  }
+
+  directMessages.push({
+    to:actor.nombre,
+    territory:actor.territorio,
+    from:currentUser?.nombre || "Perfil demo",
+    subject,
+    body,
+    date:new Date().toLocaleString("es-CO",{dateStyle:"medium",timeStyle:"short"})
+  });
+  persistDirectMessages();
+  renderMessageModal();
+  toast("Mensaje directo enviado en modo demo.");
+}
+
+function renderMessageModal(){
+  const actor=actors[messageActorIndex];
+  const modal=document.getElementById("messageModal");
+  if(!actor || !modal) return;
+
+  const recent=directMessages.filter(m=>m.to===actor.nombre).slice(-4).reverse();
+  modal.innerHTML=`
+    <div class="message-modal">
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+        <div>
+          <p class="eyebrow">Mensaje directo</p>
+          <h3 style="color:var(--blue);font-size:26px;margin:0">${safeAttr(actor.nombre)}</h3>
+          <p style="color:#66716d;line-height:1.45;margin:8px 0 0">
+            ${safeAttr(actor.tipo)} · ${safeAttr(actor.territorio)}
+          </p>
+        </div>
+        <button class="btn outline" onclick="closeMessageModal()">Cerrar</button>
+      </div>
+
+      <div class="grid two" style="margin-top:18px">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Asunto</label>
+          <input id="messageSubject" value="Propuesta de articulacion territorial" style="width:100%">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Prioridad</label>
+          <select style="width:100%"><option>Normal</option><option>Alta</option><option>Seguimiento</option></select>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Mensaje</label>
+        <textarea id="messageBody" style="width:100%">Hola, nos gustaria conversar sobre posibles conexiones alrededor de ${safeAttr(actor.temas[0])} en ${safeAttr(actor.territorio)}. Quedamos atentos para coordinar una reunion breve.</textarea>
+      </div>
+
+      <div class="inline-actions" style="justify-content:flex-end">
+        <button class="btn outline" onclick="closeMessageModal()">Cancelar</button>
+        <button class="btn" onclick="sendDirectMessage()">Enviar mensaje</button>
+      </div>
+
+      <div class="message-history">
+        <strong style="color:var(--blue)">Historial demo con esta organizacion</strong>
+        ${recent.length ? recent.map(m=>`
+          <div class="message-bubble">
+            <small>${safeAttr(m.date)} · ${safeAttr(m.from)}</small>
+            <strong>${safeAttr(m.subject)}</strong>
+            <p style="margin:6px 0 0;color:#5f6b67;line-height:1.4">${safeAttr(m.body)}</p>
+          </div>
+        `).join("") : `<p style="color:#66716d;line-height:1.45;margin:0">Aun no hay mensajes enviados a esta organizacion en la demo.</p>`}
+      </div>
+    </div>`;
+  modal.classList.add("show");
+}
+
+function submitActorUpdate(index){
+  const actor=actors[index];
+  if(!actor) return;
+
+  const nombre=document.getElementById("actorUpdateNombre")?.value.trim();
+  const descripcion=document.getElementById("actorUpdateDescripcion")?.value.trim();
+  const recursos=document.getElementById("actorUpdateRecursos")?.value.trim();
+  const necesidades=document.getElementById("actorUpdateNecesidades")?.value.trim();
+  const estado=document.getElementById("actorUpdateEstado")?.value;
+
+  actor.nombre=nombre || actor.nombre;
+  actor.descripcion=descripcion || actor.descripcion;
+  actor.recursosDisponibles=recursos ? recursos.split(",").map(x=>x.trim()).filter(Boolean) : actor.recursosDisponibles;
+  actor.necesidades=necesidades ? necesidades.split(",").map(x=>x.trim()).filter(Boolean) : actor.necesidades;
+  actor.estadoPerfil=estado || "Pendiente";
+  actor.ultimaActualizacion="Actualizado hoy";
+
+  selectedActor=actor;
+  render();
+  toast("Informacion del actor enviada para validacion en modo demo.");
 }
 
 function saveProfileEdits(){
@@ -882,13 +1141,13 @@ function initTerritorialMap(){
     setTimeout(()=>territoriaMap.invalidateSize(),120);
   },0);
 }
-const navItems=["Mi perfil","Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes","Actualizar datos"];
-const icons={"Mi perfil":"🏢","Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️","Actualizar datos":"🔄"};
+const navItems=["Mi perfil","Inicio","Mapa territorial","Directorio de actores","Perfil de actor","Red de relaciones","Oportunidades","Reportes"];
+const icons={"Mi perfil":"🏢","Inicio":"📊","Mapa territorial":"📍","Directorio de actores":"👥","Perfil de actor":"✅","Red de relaciones":"🕸️","Oportunidades":"🤝","Reportes":"🗂️"};
 
 function setActive(page){active=page;render();}
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2600)}
-function badge(v){let cls="badge"; if(["Pendiente","Sugerida"].includes(v)) cls+=" info"; if(["Media","Medio","En proceso","En contacto"].includes(v)) cls+=" warn"; return `<span class="${cls}">${v}</span>`}
-function chips(arr){return `<div class="chips">${arr.map(x=>`<span class="chip">${x}</span>`).join("")}</div>`}
+function badge(v){let cls="badge"; if(["Pendiente","Sugerida"].includes(v)) cls+=" info"; if(["Media","Medio","En proceso","En contacto"].includes(v)) cls+=" warn"; return `<span class="${cls}">${safeAttr(v)}</span>`}
+function chips(arr){return `<div class="chips">${arr.map(x=>`<span class="chip">${safeAttr(x)}</span>`).join("")}</div>`}
 function info(label,value){return `<div class="info-row"><small>${label}</small><strong>${value}</strong></div>`}
 function safeAttr(value){
   return String(value || "")
@@ -920,7 +1179,6 @@ function render(){
  if(active==="Red de relaciones") app.innerHTML=viewRed();
  if(active==="Oportunidades") app.innerHTML=viewOportunidades();
  if(active==="Reportes") app.innerHTML=viewReportes();
- if(active==="Actualizar datos") app.innerHTML=viewActualizar();
 }
 
 function viewMiPerfil(){
@@ -1215,24 +1473,150 @@ function renderDirectoryTable(){
  const filtered=actors.filter(a=>(`${a.nombre} ${a.tipo} ${a.territorio} ${a.capitalPrincipal}`.toLowerCase().includes(q))&&(terr==="Todos"||a.territorio===terr)).slice(0,30);
  document.getElementById("directoryTable").innerHTML=filtered.map((a,i)=>{
    const realIndex=actors.indexOf(a);
-   return `<tr><td><strong style="color:var(--blue)">${a.nombre}</strong></td><td>${a.tipo}</td><td>${a.territorio}</td><td>${badge(a.capitalPrincipal)}</td><td>${a.nivelConfianza}/5</td><td>${badge(a.capacidadAbsorcion)}</td><td>${badge(a.estadoPerfil)}</td><td><button class="btn outline" onclick="selectedActor=actors[${realIndex}];setActive('Perfil de actor')">Ver perfil</button></td></tr>`
+   return `<tr>
+     <td><strong style="color:var(--blue)">${safeAttr(a.nombre)}</strong></td>
+     <td>${safeAttr(a.tipo)}</td>
+     <td>${safeAttr(a.territorio)}</td>
+     <td>${badge(a.capitalPrincipal)}</td>
+     <td>${safeAttr(a.nivelConfianza+"/5")}</td>
+     <td>${badge(a.capacidadAbsorcion)}</td>
+     <td>${badge(a.estadoPerfil)}</td>
+     <td>
+       <div style="display:flex;gap:8px;flex-wrap:wrap">
+         <button class="btn outline" onclick="selectedActor=actors[${realIndex}];setActive('Perfil de actor')">Ver perfil</button>
+         <button class="btn outline" onclick="openMessageModal(${realIndex})">Mensaje</button>
+       </div>
+     </td>
+   </tr>`
  }).join("");
 }
 window.renderDirectoryTable=renderDirectoryTable;
 
 function viewPerfil(){
  const a=selectedActor;
- return `${section("Perfil de actor",a.nombre,"Ficha integral para entender capacidades, necesidades, recursos disponibles y potencial de articulación.")}
- <div class="grid profile">
- <div class="card">
- <div class="logo" style="margin-bottom:18px">🏛️</div><h3 style="font-size:28px;color:var(--blue);margin:0">${a.nombre}</h3><p style="color:#5f6b67;line-height:1.5">${a.descripcion}</p>
- <div class="chips">${badge(a.estadoPerfil)}${badge("Absorción "+a.capacidadAbsorcion)}${badge("Articulación "+a.nivelArticulacion)}</div>
- <div style="margin-top:20px">${info("Tipo",a.tipo)}${info("Territorio",a.territorio+", "+a.departamento)}${info("Fundación relacionada",a.fundacionTerritorialRelacionada)}${info("Nivel de confianza",a.nivelConfianza+"/5")}</div>
+ const actorIndex=actors.indexOf(a);
+ const actorMessages=directMessages.filter(m=>m.to===a.nombre);
+ return `${section("Perfil de actor",safeAttr(a.nombre),"Ficha integral para entender capacidades, iniciativas, necesidades, recursos disponibles y potencial de articulacion.")}
+ <div class="grid stats">
+   ${stat("I","Iniciativas activas",a.iniciativas.length)}
+   ${stat("B","Beneficiarios estimados",a.indicadores.beneficiarios)}
+   ${stat("C","Cobertura",a.indicadores.cobertura)}
+   ${stat("A","Avance promedio",a.indicadores.avance)}
  </div>
- <div>
- <div class="card grid two">${detailBlock("Capitales territoriales",[a.capitalPrincipal,...a.capitalesSecundarios])}${detailBlock("Temas de trabajo",a.temas)}${detailBlock("Recursos disponibles",a.recursosDisponibles)}${detailBlock("Necesidades",a.necesidades)}${info("Conexiones actuales",a.conexionesActuales)}${info("Oportunidades sugeridas",a.oportunidadesSugeridas)}</div>
- <div class="grid three" style="margin-top:16px"><button class="btn" onclick="toast('Conexión sugerida creada para revisión del nodo territorial.')">🤝 Sugerir conexión</button><button class="btn outline" onclick="toast('Formulario de actualización abierto en modo demo.')">🔄 Actualizar información</button><button class="btn outline" onclick="toast('Reporte del actor generado correctamente.')">⬇ Generar reporte</button></div>
- </div></div>`;
+
+ <div class="grid profile" style="margin-top:18px">
+   <div class="card">
+     <div class="logo" style="margin-bottom:18px">T</div>
+     <h3 style="font-size:28px;color:var(--blue);margin:0">${safeAttr(a.nombre)}</h3>
+     <p style="color:#5f6b67;line-height:1.5">${safeAttr(a.descripcion)}</p>
+     <div class="chips">${badge(a.estadoPerfil)}${badge("Absorcion "+a.capacidadAbsorcion)}${badge("Articulacion "+a.nivelArticulacion)}</div>
+
+     <div style="margin-top:20px">
+       ${info("Tipo",safeAttr(a.tipo))}
+       ${info("Territorio",safeAttr(a.territorio+", "+a.departamento))}
+       ${info("Fundacion relacionada",safeAttr(a.fundacionTerritorialRelacionada))}
+       ${info("Nivel de confianza",safeAttr(a.nivelConfianza+"/5"))}
+       ${info("Ultima actualizacion",safeAttr(a.ultimaActualizacion))}
+     </div>
+
+     <div class="inline-actions">
+       <button class="btn" onclick="openMessageModal(${actorIndex})">Enviar mensaje directo</button>
+       <button class="btn outline" onclick="document.getElementById('actorUpdatePanel')?.scrollIntoView({behavior:'smooth'})">Actualizar informacion</button>
+     </div>
+   </div>
+
+   <div>
+     <div class="card grid two">
+       ${detailBlock("Capitales territoriales",[a.capitalPrincipal,...a.capitalesSecundarios])}
+       ${detailBlock("Temas de trabajo",a.temas)}
+       ${detailBlock("Recursos disponibles",a.recursosDisponibles)}
+       ${detailBlock("Necesidades",a.necesidades)}
+       ${info("Conexiones actuales",safeAttr(a.conexionesActuales))}
+       ${info("Oportunidades sugeridas",safeAttr(a.oportunidadesSugeridas))}
+       ${info("Presupuesto / aporte",safeAttr(a.indicadores.presupuesto))}
+       ${info("Mensajes enviados",safeAttr(actorMessages.length))}
+     </div>
+
+     <div class="grid three" style="margin-top:16px">
+       <button class="btn" onclick="toast('Conexion sugerida creada para revision del nodo territorial.')">Sugerir conexion</button>
+       <button class="btn outline" onclick="openMessageModal(${actorIndex})">Mensaje</button>
+       <button class="btn outline" onclick="toast('Reporte del actor generado correctamente.')">Generar reporte</button>
+     </div>
+   </div>
+ </div>
+
+ <div class="grid two" style="margin-top:18px">
+   <div class="card">
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Iniciativas y proyectos</h3>
+     <div class="initiative-list">
+       ${a.iniciativas.map(item=>`
+         <div class="initiative-card">
+           <h4>${safeAttr(item.nombre)} ${badge(item.estado)}</h4>
+           <small style="color:#6d7773">${safeAttr(item.alcance)}</small>
+           <p>${safeAttr(item.descripcion)}</p>
+         </div>
+       `).join("")}
+     </div>
+   </div>
+
+   <div class="card">
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Informacion relevante</h3>
+     ${a.datosRelevantes.map(d=>`
+       <div class="info-row">
+         <small>Dato para decision</small>
+         <strong>${safeAttr(d)}</strong>
+       </div>
+     `).join("")}
+     ${info("Observacion",safeAttr(a.observaciones))}
+     ${info("Uso sugerido del dato","Priorizar contacto, validar necesidades y activar matching territorial.")}
+   </div>
+ </div>
+
+ ${viewActorUpdatePanel(a,actorIndex)}`;
+}
+
+function viewActorUpdatePanel(a,index){
+ return `
+ <div id="actorUpdatePanel" class="card" style="margin-top:18px">
+   <h3 style="color:var(--blue);font-size:24px;margin-top:0">Actualizar informacion de este perfil</h3>
+   <p style="color:#66716d;line-height:1.5">
+     Formulario contextual para proponer cambios desde la ficha del actor. En esta demo, la actualizacion queda reflejada en pantalla y marcada para validacion.
+   </p>
+
+   <div class="grid form">
+     <div>
+       <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Nombre del actor</label>
+       <input id="actorUpdateNombre" value="${safeAttr(a.nombre)}">
+     </div>
+
+     <div>
+       <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Estado del perfil</label>
+       <select id="actorUpdateEstado">
+         ${["Validado","Pendiente","Desactualizado"].map(x=>optionTag(x,x,a.estadoPerfil)).join("")}
+       </select>
+     </div>
+
+     <div>
+       <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Recursos disponibles</label>
+       <textarea id="actorUpdateRecursos">${safeAttr(a.recursosDisponibles.join(", "))}</textarea>
+     </div>
+
+     <div>
+       <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Necesidades</label>
+       <textarea id="actorUpdateNecesidades">${safeAttr(a.necesidades.join(", "))}</textarea>
+     </div>
+
+     <div style="grid-column:1/-1">
+       <label style="display:block;font-size:11px;font-weight:800;color:#66716d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Descripcion</label>
+       <textarea id="actorUpdateDescripcion">${safeAttr(a.descripcion)}</textarea>
+     </div>
+   </div>
+
+   <div class="inline-actions" style="justify-content:flex-end">
+     <button class="btn outline" onclick="toast('Borrador de actualizacion guardado en modo demo.')">Guardar borrador</button>
+     <button class="btn" onclick="submitActorUpdate(${index})">Enviar actualizacion</button>
+   </div>
+ </div>`;
 }
 
 function detailBlock(title,items){return `<div><h3 style="color:var(--blue);font-size:17px">${title}</h3>${chips(items)}</div>`}
@@ -1447,12 +1831,25 @@ function viewRed(){
 }
 
 function viewOportunidades(){
- return `${section("Matching territorial","Oportunidades de articulación","Cruce inteligente entre necesidades, recursos disponibles, confianza, territorio compartido y capacidad de absorción.")}
- <div class="grid stats">${stat("✦","Identificadas","34")}${stat("🤝","En contacto","12")}${stat("🔄","En proceso","8")}${stat("✅","Concretadas","5")}</div>
- <div class="card" style="margin:18px 0"><strong style="color:var(--blue)">Criterios de coincidencia:</strong> territorio compartido, complementariedad entre necesidad y recurso, nivel de confianza, capacidad de absorción y relación con una Fundación Territorial.</div>
+ return `${section("Matching territorial","Oportunidades de articulacion","Cruce inteligente entre necesidades, recursos disponibles, confianza, territorio compartido y capacidad de absorcion.")}
+ <div class="grid stats">${stat("*","Identificadas","34")}${stat("M","En contacto","12")}${stat("P","En proceso","8")}${stat("C","Concretadas","5")}</div>
+ <div class="card" style="margin:18px 0"><strong style="color:var(--blue)">Criterios de coincidencia:</strong> territorio compartido, complementariedad entre necesidad y recurso, nivel de confianza, capacidad de absorcion y relacion con una Fundacion Territorial.</div>
  <div class="grid mapgrid">
- <div class="grid">${opportunities.map((o,i)=>`<div class="card opp ${selectedOpportunity.need===o.need?"selected":""}" onclick="selectedOpportunity=opportunities[${i}];render()"><div style="display:flex;justify-content:space-between;gap:18px"><div><h3 style="color:var(--blue);margin:0">${o.need} ${badge(o.status)}</h3><p><strong>${o.seeker}</strong> necesita conectar con <strong>${o.provider}</strong></p><small>Recurso disponible: ${o.resource} · ${o.territory}</small></div><div class="score">${o.score}%</div></div></div>`).join("")}</div>
- <div class="card"><p class="eyebrow">Detalle de coincidencia</p><h3 style="font-size:26px;color:var(--blue);margin-top:0">${selectedOpportunity.need}</h3><p style="color:#5f6b67;line-height:1.5">${selectedOpportunity.reason}</p>${info("Actor que necesita",selectedOpportunity.seeker)}${info("Actor que aporta",selectedOpportunity.provider)}${info("Recurso disponible",selectedOpportunity.resource)}${info("Estado",selectedOpportunity.status)}<button class="btn" style="width:100%" onclick="toast('Oportunidad de articulación creada. Se recomienda activar una mesa de trabajo.')">Conectar actores</button></div>
+ <div class="grid">${opportunities.map((o,i)=>`<div class="card opp ${selectedOpportunity.need===o.need?"selected":""}" onclick="selectedOpportunity=opportunities[${i}];render()"><div style="display:flex;justify-content:space-between;gap:18px"><div><h3 style="color:var(--blue);margin:0">${safeAttr(o.need)} ${badge(o.status)}</h3><p><strong>${safeAttr(o.seeker)}</strong> necesita conectar con <strong>${safeAttr(o.provider)}</strong></p><small>Recurso disponible: ${safeAttr(o.resource)} · ${safeAttr(o.territory)}</small></div><div class="score">${o.score}%</div></div></div>`).join("")}</div>
+ <div class="card">
+   <p class="eyebrow">Detalle de coincidencia</p>
+   <h3 style="font-size:26px;color:var(--blue);margin-top:0">${safeAttr(selectedOpportunity.need)}</h3>
+   <p style="color:#5f6b67;line-height:1.5">${safeAttr(selectedOpportunity.reason)}</p>
+   ${info("Actor que necesita",safeAttr(selectedOpportunity.seeker))}
+   ${info("Actor que aporta",safeAttr(selectedOpportunity.provider))}
+   ${info("Recurso disponible",safeAttr(selectedOpportunity.resource))}
+   ${info("Estado",safeAttr(selectedOpportunity.status))}
+   <div class="inline-actions">
+     <button class="btn" onclick="toast('Oportunidad de articulacion creada. Se recomienda activar una mesa de trabajo.')">Conectar actores</button>
+     <button class="btn outline" onclick="openMessageByName(selectedOpportunity.provider)">Mensaje al aportante</button>
+     <button class="btn outline" onclick="openMessageByName(selectedOpportunity.seeker)">Mensaje al solicitante</button>
+   </div>
+ </div>
  </div>`;
 }
 
@@ -1462,19 +1859,6 @@ function viewReportes(){
  <div class="grid two">${chartCard("Densidad de red por territorio",territories.slice(0,7).map((t,i)=>({name:t.name.slice(0,11),value:28+i*6})))}${chartCard("Oportunidades de inversión social",[{name:"Ambiente",value:12},{name:"Cultura",value:9},{name:"Juventud",value:8},{name:"Economía",value:7},{name:"Gobernanza",value:6}],"blue")}</div>
  <div class="grid two" style="margin-top:20px">${alerts.map(a=>`<div class="card alert"><div class="spark">⚠️</div><p>${a}</p></div>`).join("")}</div>
  <div class="filters" style="margin-top:20px"><button class="btn" onclick="toast('Reporte descargado en modo demo.')">Descargar reporte</button><button class="btn" onclick="toast('Recomendación generada correctamente.')">Generar recomendación</button><button class="btn" onclick="toast('Territorio priorizado para análisis.')">Priorizar territorio</button></div>`;
-}
-
-function viewActualizar(){
- return `${section("Gobernanza de datos","Actualizar información del ecosistema","Formulario simulado para que los nodos territoriales mantengan viva y validada la información de actores, recursos y necesidades.")}
- <div class="card"><div class="grid form">
- <input placeholder="Nombre del actor"><input placeholder="Departamento"><textarea placeholder="Descripción"></textarea><textarea placeholder="Recursos disponibles"></textarea><textarea placeholder="Necesidades"></textarea>
- <select><option>Tipo de actor</option>${actorTypes.map(x=>`<option>${x}</option>`).join("")}</select>
- <select><option>Territorio</option>${territories.map(x=>`<option>${x.name}</option>`).join("")}</select>
- <select><option>Capital principal</option>${capitals.map(x=>`<option>${x}</option>`).join("")}</select>
- <select><option>Tema de trabajo</option>${topics.map(x=>`<option>${x}</option>`).join("")}</select>
- <select><option>Nivel de confianza</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
- <select><option>Capacidad de absorción</option><option>Baja</option><option>Media</option><option>Alta</option></select>
- </div><div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="btn" onclick="toast('Información enviada para validación por el nodo territorial.')">Enviar actualización</button></div></div>`;
 }
 
 render();
