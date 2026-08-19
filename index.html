@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -689,8 +688,344 @@ body:not(.logged-out) .login-screen{
   margin-top:10px;
 }
 
+.hidden-view{
+  display:none !important;
+}
+
+.guided-network{
+  border:1px solid var(--border);
+  border-radius:22px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.96),rgba(234,243,251,.92)),
+    radial-gradient(circle at 78% 12%,rgba(245,158,11,.16),transparent 28%);
+  padding:18px;
+  min-height:560px;
+}
+
+.guided-header{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:flex-start;
+  margin-bottom:16px;
+}
+
+.guided-header h3{
+  color:var(--blue);
+  font-size:24px;
+  margin:0 0 6px;
+}
+
+.guided-header p{
+  color:#5f6b67;
+  line-height:1.45;
+  margin:0;
+  max-width:620px;
+}
+
+.guided-score{
+  min-width:190px;
+  border:1px solid #CFE1F2;
+  border-radius:18px;
+  padding:13px;
+  background:#fff;
+  box-shadow:0 12px 24px rgba(37,99,235,.09);
+}
+
+.guided-score small,
+.guided-lane-title{
+  display:block;
+  color:#66716d;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.guided-score strong{
+  display:block;
+  color:var(--blue);
+  line-height:1.2;
+}
+
+.guided-score span{
+  display:block;
+  color:#66716d;
+  font-size:12px;
+  margin-top:6px;
+}
+
+.guided-flow{
+  display:grid;
+  grid-template-columns:.9fr 1.08fr 1.12fr;
+  gap:14px;
+  align-items:stretch;
+}
+
+.guided-lane{
+  border:1px solid #D9E8F5;
+  border-radius:18px;
+  background:rgba(255,255,255,.72);
+  padding:14px;
+  min-width:0;
+}
+
+.guided-node-card{
+  width:100%;
+  border:1px solid #CFE1F2;
+  border-radius:16px;
+  background:#fff;
+  padding:13px;
+  margin-top:10px;
+  text-align:left;
+  cursor:pointer;
+  font:inherit;
+  box-shadow:0 10px 20px rgba(15,42,68,.06);
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.guided-node-card:hover{
+  transform:translateY(-2px);
+  border-color:#93C5FD;
+  box-shadow:0 14px 26px rgba(37,99,235,.13);
+}
+
+.guided-node-card.focus{
+  border-color:#2563EB;
+  background:linear-gradient(135deg,#fff,#EFF6FF);
+}
+
+.guided-node-card.connected{
+  position:relative;
+}
+
+.guided-node-card.connected:before{
+  content:"";
+  position:absolute;
+  left:-16px;
+  top:50%;
+  width:16px;
+  height:2px;
+  background:#F59E0B;
+}
+
+.guided-card-top{
+  display:grid;
+  grid-template-columns:16px 1fr;
+  gap:8px;
+  align-items:start;
+}
+
+.guided-dot{
+  width:12px;
+  height:12px;
+  border-radius:999px;
+  margin-top:3px;
+  box-shadow:0 0 0 4px rgba(37,99,235,.08);
+}
+
+.guided-node-card strong{
+  display:block;
+  color:var(--blue);
+  line-height:1.22;
+  overflow-wrap:anywhere;
+}
+
+.guided-node-card em{
+  display:block;
+  color:#66716d;
+  font-style:normal;
+  font-size:12px;
+  line-height:1.35;
+  margin-top:7px;
+}
+
+.guided-node-card span.meta{
+  display:inline-flex;
+  margin-top:9px;
+  border-radius:999px;
+  padding:5px 8px;
+  background:#EAF2FF;
+  color:#1D4ED8;
+  font-size:12px;
+  font-weight:800;
+}
+
+.guided-action{
+  display:grid;
+  grid-template-columns:30px 1fr;
+  gap:10px;
+  border:1px solid #D9E8F5;
+  border-radius:16px;
+  padding:12px;
+  background:#fff;
+  margin-top:10px;
+}
+
+.guided-index{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:#2563EB;
+  color:white;
+  font-size:12px;
+  font-weight:900;
+}
+
+.guided-action strong{
+  display:block;
+  color:var(--blue);
+  line-height:1.25;
+}
+
+.guided-action p{
+  color:#5f6b67;
+  font-size:13px;
+  line-height:1.35;
+  margin:6px 0 8px;
+}
+
+.guided-action span{
+  color:#8A5A00;
+  background:#FFF7ED;
+  border-radius:12px;
+  display:inline-block;
+  padding:6px 8px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.guided-table-wrap{
+  margin-top:16px;
+  overflow:auto;
+  border:1px solid #D9E8F5;
+  border-radius:16px;
+  background:#fff;
+}
+
+.guided-table th{
+  background:#EAF3FB;
+  color:#0F2A44;
+}
+
+.guided-table td{
+  min-width:135px;
+}
+
+.guided-empty{
+  color:#66716d;
+  line-height:1.45;
+  margin:12px 0 0;
+}
+
+@media (max-width:1050px){
+  .guided-flow{
+    grid-template-columns:1fr;
+  }
+  .guided-node-card.connected:before{
+    display:none;
+  }
+}
+
+@media (max-width:720px){
+  .guided-header{
+    display:block;
+  }
+  .guided-score{
+    margin-top:12px;
+    min-width:0;
+  }
+  .guided-network{
+    padding:14px;
+  }
+}
+
+.pilot-strip{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:16px;
+  align-items:stretch;
+  margin:20px 0;
+}
+
+.pain-card{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(135deg,#fff,#F8FBFF);
+}
+
+.pain-card small,
+.timeline-step small{
+  display:block;
+  color:#66716d;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.pain-card strong{
+  display:block;
+  color:var(--blue);
+  font-size:17px;
+  line-height:1.25;
+}
+
+.pain-card p,
+.timeline-step p{
+  color:#5f6b67;
+  line-height:1.45;
+  margin:8px 0 0;
+}
+
+.timeline-step{
+  border-left:4px solid var(--green);
+  padding:10px 0 10px 14px;
+  margin:8px 0;
+}
+
+.update-pill{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:800;
+  background:#EAF2FF;
+  color:#1D4ED8;
+}
+
+.update-pill.pending{background:#E0F2FE;color:#075985}
+.update-pill.due{background:#FFF7ED;color:#9A3412}
+.update-pill.ready{background:#DCFCE7;color:#166534}
+
+.recognition-list{
+  display:grid;
+  gap:10px;
+}
+
+.recognition-item{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  background:#F8FBFF;
+}
+
+.whatsapp-box{
+  border:1px dashed var(--sage);
+  border-radius:18px;
+  padding:16px;
+  background:#F8FBFF;
+}
+
 @media(max-width:1050px){
-  .home-insight-panel{grid-template-columns:1fr}
+  .home-insight-panel,
+  .pilot-strip{grid-template-columns:1fr}
 }
 
 @media(max-width:1050px){
@@ -895,7 +1230,7 @@ let selectedTerritory=territories[4];
 let selectedOpportunity=opportunities[0];
 let selectedNetworkNode=null;
 let selectedHomeInsight=null;
-let networkLayoutMode="relacional";
+let networkLayoutMode="guiado";
 let currentUser=null;
 let currentProfileKey=null;
 let messageActorIndex=0;
@@ -1227,13 +1562,15 @@ function connectionScore(a,b){
   const validation=b.validacionTerritorial==="Validado por nodo territorial" ? 8 : 0;
   const trust=Math.round(((Number(a.nivelConfianza)||3)+(Number(b.nivelConfianza)||3))*3);
   const capacity=b.capacidadAbsorcion==="Alta" ? 8 : b.capacidadAbsorcion==="Media" ? 4 : 0;
-  const score=Math.min(100,complement*14+topic*7+sameTerritory+sameCapital+trust+capacity+validation);
+  const updateBoost=actorUpdateMeta(b,actors.indexOf(b)).recognition ? 6 : 0;
+  const score=Math.min(100,complement*14+topic*7+sameTerritory+sameCapital+trust+capacity+validation+updateBoost);
   const reasons=[
     complement>0 ? "Complementariedad entre necesidades y recursos" : "",
     topic>0 ? "Temas de trabajo relacionados" : "",
     sameTerritory ? "Comparten territorio" : "",
     sameCapital ? "Capital territorial similar" : "",
     validation ? "Perfil validado por nodo territorial" : "",
+    updateBoost ? "Datos actualizados durante el trimestre" : "",
     trust>=24 ? "Buen nivel de confianza" : ""
   ].filter(Boolean);
   return { actor:b, score, reasons:reasons.length ? reasons : ["Conexión exploratoria por afinidad territorial"] };
@@ -1304,6 +1641,10 @@ function setActorValidation(index,value){
   actor.validacionTerritorial=value;
   actor.estadoPerfil=value==="Validado por nodo territorial" ? "Validado" : "Pendiente";
   actor.ultimaActualizacion="Revisado hoy";
+  if(value==="Validado por nodo territorial"){
+    actor.actualizacionTrimestral=true;
+    actor.actualizacionWhatsApp="Respondida";
+  }
   refreshActorIntelligence();
   persistImportedActors();
   render();
@@ -1327,6 +1668,8 @@ function submitActorUpdate(index){
   actor.visibilidad=visibilidad || actor.visibilidad;
   actor.validacionTerritorial=actor.estadoPerfil==="Validado" ? "Validado por nodo territorial" : "Pendiente de validación";
   actor.ultimaActualizacion="Actualizado hoy";
+  actor.actualizacionTrimestral=true;
+  actor.actualizacionWhatsApp="Respondida";
   selectedActor=actor;
   refreshActorIntelligence();
   persistImportedActors();
@@ -1786,6 +2129,128 @@ function safeJs(value){
   return JSON.stringify(String(value || ""));
 }
 
+function currentQuarterLabel(){
+  const today=new Date();
+  return `T${Math.floor(today.getMonth()/3)+1} ${today.getFullYear()}`;
+}
+
+function actorUpdateMeta(actor,index=actors.indexOf(actor)){
+  const i=index<0?0:index;
+  const explicit=actor.actualizacionTrimestral===true || actor.ultimaActualizacion==="Actualizado hoy";
+  const due=actor.estadoPerfil==="Desactualizado" || actor.validacionTerritorial==="Requiere actualizaciÃ³n" || actor.ultimaActualizacion==="Requiere validaciÃ³n";
+  const ready=explicit || (!due && (actor.estadoPerfil==="Validado" || actor.validacionTerritorial==="Validado por nodo territorial") && i%4!==2);
+  const pending=!ready && !due;
+  return {
+    label:ready?"Actualizado trimestre":due?"Vencido / requiere datos":"Pendiente WhatsApp",
+    className:ready?"ready":due?"due":"pending",
+    recognition:ready,
+    matchingBoost:ready?"+ visibilidad en matching":pending?"Recordatorio activo":"Riesgo de baja visibilidad",
+    reportText:ready?`Citable en informe territorial ${currentQuarterLabel()}`:"No citable hasta actualizar datos"
+  };
+}
+
+function updatePill(actor,index=actors.indexOf(actor)){
+  const meta=actorUpdateMeta(actor,index);
+  return `<span class="update-pill ${meta.className}">${safeAttr(meta.label)}</span>`;
+}
+
+function whatsappUpdateText(actor){
+  return `Hola, estamos actualizando el mapa territorial de actores de la Red. Puedes ayudarnos validando estos datos de ${actor.nombre}: territorio, temas de trabajo, recursos disponibles, necesidades e iniciativas activas. La organizacion que actualice sus datos durante el trimestre podra ser referenciada en el informe territorial de la Red.`;
+}
+
+function whatsappUpdateUrl(actor){
+  return `https://wa.me/?text=${encodeURIComponent(whatsappUpdateText(actor))}`;
+}
+
+function requestWhatsappUpdate(index){
+  const actor=actors[index];
+  if(!actor) return;
+  actor.actualizacionWhatsApp="Solicitada";
+  actor.ultimaSolicitudWhatsApp="Hoy";
+  persistImportedActors();
+  render();
+  window.open(whatsappUpdateUrl(actor),"_blank","noopener");
+  toast("Mensaje de actualizacion por WhatsApp preparado.");
+}
+
+function markQuarterUpdated(index){
+  const actor=actors[index];
+  if(!actor) return;
+  actor.actualizacionTrimestral=true;
+  actor.ultimaActualizacion="Actualizado hoy";
+  actor.estadoPerfil="Validado";
+  actor.validacionTerritorial=canValidateActors() ? "Validado por nodo territorial" : "Pendiente de validaciÃ³n";
+  refreshActorIntelligence();
+  persistImportedActors();
+  render();
+  toast("Datos actualizados. La organizacion queda elegible para reconocimiento trimestral.");
+}
+
+function recognizedQuarterActors(limit=8){
+  return actors
+    .map((actor,index)=>({actor,index,meta:actorUpdateMeta(actor,index)}))
+    .filter(item=>item.meta.recognition)
+    .slice(0,limit);
+}
+
+function foundationPainCards(){
+  return [
+    {
+      pain:"No saber quien hace que",
+      solution:"Mapa de actores por municipio, tema, capacidad y relaciones",
+      example:"Ejemplo: en Guasca se ve rapido que hay actores ambientales fuertes, pero faltan conexiones con empresas locales."
+    },
+    {
+      pain:"Perseguir datos desactualizados",
+      solution:"Semaforo de actualizacion y solicitud por WhatsApp",
+      example:"Ejemplo: perfiles vencidos reciben un mensaje listo para validar territorio, necesidades, recursos e iniciativas."
+    },
+    {
+      pain:"Mostrar evidencia a donantes",
+      solution:"Lecturas territoriales, reconocimiento trimestral y due diligence",
+      example:"Ejemplo: una Fundacion Territorial activa queda mejor posicionada como interlocutora ante cooperantes."
+    }
+  ];
+}
+
+function quarterlyRecognitionPanel(limit=6){
+  const recognized=recognizedQuarterActors(limit);
+  return `<div class="recognition-list">
+    ${recognized.map(({actor,index,meta})=>`
+      <div class="recognition-item">
+        <small class="mini-note">${safeAttr(actor.territorio)} Â· ${safeAttr(actor.tipo)}</small>
+        <strong style="color:var(--blue)">${safeAttr(actor.nombre)}</strong>
+        <p class="mini-note" style="margin:6px 0">${safeAttr(meta.reportText)}. ${safeAttr(meta.matchingBoost)}.</p>
+        <div class="inline-actions">
+          ${updatePill(actor,index)}
+          <button class="btn outline" onclick="selectedActor=actors[${index}];setActive('Perfil de actor')">Ver ficha</button>
+        </div>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+function whatsappUpdateQueue(limit=6){
+  const queue=actors
+    .map((actor,index)=>({actor,index,meta:actorUpdateMeta(actor,index)}))
+    .filter(item=>item.meta.className!=="ready")
+    .slice(0,limit);
+  return `<div class="recognition-list">
+    ${queue.map(({actor,index,meta})=>`
+      <div class="recognition-item">
+        <small class="mini-note">${safeAttr(actor.territorio)} Â· ${safeAttr(actor.responsableDato || actor.fundacionTerritorialRelacionada)}</small>
+        <strong style="color:var(--blue)">${safeAttr(actor.nombre)}</strong>
+        <p class="mini-note" style="margin:6px 0">${safeAttr(meta.matchingBoost)}. Ultima actualizacion: ${safeAttr(actor.ultimaActualizacion)}.</p>
+        <div class="inline-actions">
+          ${updatePill(actor,index)}
+          <button class="btn outline" onclick="requestWhatsappUpdate(${index})">Solicitar por WhatsApp</button>
+          ${canEditActor(actor) ? `<button class="btn" onclick="markQuarterUpdated(${index})">Marcar actualizado</button>` : ""}
+        </div>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
 function setHomeInsight(chart,name,value){
   selectedHomeInsight={chart,name,value};
   render();
@@ -2014,6 +2479,11 @@ function viewInicio(){
  const byTerritory=territories.map(t=>({name:t.name.length>12?t.name.slice(0,12)+"…":t.name,value:t.actors}));
  const needs=[{name:"Financiación",value:42},{name:"Comercial.",value:35},{name:"Gobernanza",value:29},{name:"Medición",value:24}];
  const caps=capitals.slice(0,6).map((c,i)=>({name:c.replace("Capital ",""),value:18+i*5}));
+ const updateItems=actors.map((actor,index)=>({actor,index,meta:actorUpdateMeta(actor,index)}));
+ const updatedCount=updateItems.filter(item=>item.meta.recognition).length;
+ const pendingWhatsapp=updateItems.filter(item=>item.meta.className==="pending").length;
+ const dueCount=updateItems.filter(item=>item.meta.className==="due").length;
+ const painCards=foundationPainCards();
  if(!selectedHomeInsight){
    selectedHomeInsight={chart:"Actores por territorio",name:byTerritory[0].name,value:byTerritory[0].value};
  }
@@ -2031,6 +2501,49 @@ function viewInicio(){
  ${stat("D","Recursos disponibles","82")}
  ${stat("V","Perfiles validados",Math.round(actors.filter(a=>a.estadoPerfil==="Validado").length/actors.length*100)+"%")}
  ${stat("C","Confianza promedio","4.2/5")}
+ </div>
+ <div class="grid stats" style="margin-top:16px">
+ ${stat("U","Actualizados trimestre",updatedCount,`Elegibles informe ${currentQuarterLabel()}`)}
+ ${stat("W","Pendientes WhatsApp",pendingWhatsapp+dueCount,"Cola de actualizacion")}
+ ${stat("R","Reconocimiento",recognizedQuarterActors().length,"Organizaciones citables")}
+ ${stat("P","Foco del piloto","Mapeo de actores","Valor directo para Fundaciones")}
+ </div>
+ <div class="pilot-strip">
+   <div class="card">
+     <p class="eyebrow">Dolores que resolvemos</p>
+     <h3 style="color:var(--blue);font-size:24px;margin:0 0 14px">Tres beneficios concretos para una Fundacion Territorial</h3>
+     <div class="grid three">
+       ${painCards.map(item=>`
+         <div class="pain-card">
+           <small>Dolor</small>
+           <strong>${safeAttr(item.pain)}</strong>
+           <p><b>Solucion:</b> ${safeAttr(item.solution)}</p>
+           <p class="mini-note">${safeAttr(item.example)}</p>
+         </div>
+       `).join("")}
+     </div>
+   </div>
+   <div class="card">
+     <p class="eyebrow">Estrategia de valor</p>
+     <h3 style="color:var(--blue);font-size:24px;margin:0 0 12px">De mapeo a fidelizacion</h3>
+     <div class="timeline-step"><small>Meses 1 a 3</small><strong>Mapear y activar habito</strong><p>WhatsApp, semaforo de actualizacion y reconocimiento trimestral por aparecer en el informe territorial.</p></div>
+     <div class="timeline-step"><small>Meses 4 a 12</small><strong>Consolidar valor percibido</strong><p>Perfiles completos suben en matching, las Fundaciones activas ganan posicion en diagnosticos y las organizaciones reciben lecturas de su municipio.</p></div>
+     <div class="timeline-step"><small>Largo plazo</small><strong>Gobernanza como fidelizacion</strong><p>Actualizar datos deja de ser carga administrativa y se vuelve acceso a visibilidad, evidencia y oportunidades.</p></div>
+   </div>
+ </div>
+ <div class="grid two" style="margin-top:20px">
+   <div class="card">
+     <p class="eyebrow">Actualizacion por WhatsApp</p>
+     <h3 style="color:var(--blue);font-size:24px;margin:0 0 8px">Cola de actores para mantener vivo el mapa</h3>
+     <p class="mini-note">El flujo no obliga a entrar a la plataforma: prepara un mensaje de WhatsApp para validar datos basicos, necesidades, recursos e iniciativas.</p>
+     <div style="margin-top:14px">${whatsappUpdateQueue(4)}</div>
+   </div>
+   <div class="card">
+     <p class="eyebrow">Reconocimiento trimestral</p>
+     <h3 style="color:var(--blue);font-size:24px;margin:0 0 8px">Organizaciones citables en el informe territorial</h3>
+     <p class="mini-note">Ser nombrada en un informe con respaldo academico funciona como incentivo tangible para organizaciones con baja visibilidad institucional.</p>
+     <div style="margin-top:14px">${quarterlyRecognitionPanel(4)}</div>
+   </div>
  </div>
  ${roleDashboard()}
  <div class="home-insight-panel">
@@ -2238,7 +2751,7 @@ function viewDirectorio(){
      <select id="territoryFilter" onchange="renderDirectoryTable()"><option>Todos</option>${territories.map(t=>`<option>${safeAttr(t.name)}</option>`).join("")}</select>
    </div>
  </div>
- <div class="card" style="margin-top:16px;overflow:auto"><table><thead><tr><th>Nombre</th><th>Tipo</th><th>Territorio</th><th>Score</th><th>Visibilidad</th><th>Validación</th><th></th></tr></thead><tbody id="directoryTable"></tbody></table></div>`;
+ <div class="card" style="margin-top:16px;overflow:auto"><table><thead><tr><th>Nombre</th><th>Tipo</th><th>Territorio</th><th>Score</th><th>Visibilidad</th><th>Actualización</th><th>Validación</th><th></th></tr></thead><tbody id="directoryTable"></tbody></table></div>`;
 }
 
 function renderDirectoryTable(){
@@ -2252,17 +2765,20 @@ function renderDirectoryTable(){
  document.getElementById("directoryTable").innerHTML=filtered.map(a=>{
    const realIndex=actors.indexOf(a);
    const evaluation=a.evaluacionRapida || evaluateActor(a);
+   const updateMeta=actorUpdateMeta(a,realIndex);
    return `<tr>
      <td><strong style="color:var(--blue)">${safeAttr(a.nombre)}</strong><br><small class="mini-note">${safeAttr(a.capitalPrincipal)}</small></td>
      <td>${safeAttr(a.tipo)}</td>
      <td>${safeAttr(a.territorio)}</td>
      <td><strong style="color:var(--green)">${safeAttr(evaluation.puntaje)}/100</strong><br><small>${safeAttr(evaluation.nivel)}</small></td>
      <td><span class="access-pill ${a.visibilidad==="Privado"?"private":a.visibilidad==="Aliados verificados"?"verified":"public"}">${safeAttr(a.visibilidad || "Público")}</span></td>
+     <td>${updatePill(a,realIndex)}<br><small class="mini-note">${safeAttr(updateMeta.matchingBoost)}</small></td>
      <td>${badge(a.estadoPerfil)}<br><small class="mini-note">${safeAttr(a.validacionTerritorial || "Pendiente")}</small></td>
      <td>
        <div style="display:flex;gap:8px;flex-wrap:wrap">
          <button class="btn outline" onclick="selectedActor=actors[${realIndex}];setActive('Perfil de actor')">Ver perfil</button>
          <button class="btn outline" onclick="openMessageModal(${realIndex})">Mensaje</button>
+         <button class="btn outline" onclick="requestWhatsappUpdate(${realIndex})">WhatsApp</button>
        </div>
      </td>
    </tr>`;
@@ -2276,12 +2792,31 @@ function viewPerfil(){
  const actorMessages=directMessages.filter(m=>m.to===a.nombre);
  const evaluation=a.evaluacionRapida || evaluateActor(a);
  const matches=suggestConnections(a);
+ const updateMeta=actorUpdateMeta(a,actorIndex);
  return `${section("Perfil de actor",safeAttr(a.nombre),"Ficha integral para entender capacidades, gobernanza de datos, necesidades, recursos disponibles y potencial de articulación.")}
  <div class="grid stats">
    ${stat("S","Índice de absorción",evaluation.puntaje+"/100",evaluation.nivel)}
    ${stat("I","Iniciativas activas",a.iniciativas.length)}
    ${stat("B","Beneficiarios estimados",a.indicadores.beneficiarios)}
    ${stat("V","Visibilidad",a.visibilidad || "Público")}
+ </div>
+ <div class="card whatsapp-box" style="margin-top:18px">
+   <div style="display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap">
+     <div>
+       <p class="eyebrow">Actualización e incentivo</p>
+       <h3 style="color:var(--blue);font-size:24px;margin:0 0 8px">Datos vivos para aparecer mejor en el mapa</h3>
+       <p class="mini-note">Cuando la organización actualiza su ficha durante el trimestre, queda elegible para ser citada en el informe territorial y gana prioridad en resultados de matching.</p>
+     </div>
+     <div style="min-width:220px">
+       ${updatePill(a,actorIndex)}
+       ${info("Informe territorial",safeAttr(updateMeta.reportText))}
+       ${info("Efecto en matching",safeAttr(updateMeta.matchingBoost))}
+     </div>
+   </div>
+   <div class="inline-actions">
+     <button class="btn outline" onclick="requestWhatsappUpdate(${actorIndex})">Solicitar actualización por WhatsApp</button>
+     ${canEditActor(a) ? `<button class="btn" onclick="markQuarterUpdated(${actorIndex})">Marcar datos actualizados</button>` : ""}
+   </div>
  </div>
  <div class="grid profile" style="margin-top:18px">
    <div class="card">
@@ -2464,7 +2999,7 @@ const typeColors={
    };
  });
  const selected=nodes.find(n=>n.id===selectedBase.id) || nodes[0];
- const suggested=suggestConnections(selected).slice(0,7);
+ const suggested=suggestConnections(selected).filter(m=>m.actor.id!==selected.id).slice(0,7);
  const suggestedIds=new Set(suggested.map(m=>m.actor.id));
  const links=[
    ...suggested.map((m,i)=>({from:selected,to:nodes.find(n=>n.id===m.actor.id),strength:4,type:m.reasons.join(" · "),score:m.score,focus:true})).filter(l=>l.to),
@@ -2486,22 +3021,110 @@ const typeColors={
    return `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`;
  }
  const legendTypes=["Fundación Territorial","Organización de la sociedad civil","Empresa local","Institución pública","Universidad / centro de conocimiento","Cooperante / aliado filantrópico"];
+ const modeLabels={guiado:"Mapa guiado",relacional:"Foco relacional",tipo:"Por tipo",confianza:"Por confianza"};
+ const modeLabel=modeLabels[networkLayoutMode] || networkLayoutMode;
+ const nodeIds=new Set(nodes.map(n=>n.id));
+ const visibleSuggested=suggested.filter(m=>nodeIds.has(m.actor.id));
+ const guidedMatches=(visibleSuggested.length ? visibleSuggested : suggested).slice(0,5);
+ function matchKind(match){
+   const text=(match.reasons || []).join(" ").toLowerCase();
+   if(text.includes("territorio")) return "Mismo territorio";
+   if(text.includes("recurso") || text.includes("complement")) return "Recurso complementario";
+   if(text.includes("tema") || text.includes("agenda")) return "Agenda común";
+   if(text.includes("actualiz")) return "Dato confiable";
+   return "Oportunidad de articulación";
+ }
+ function matchAction(match){
+   const type=match.actor.tipo || "";
+   const text=(match.reasons || []).join(" ").toLowerCase();
+   if(type.includes("Cooperante")) return "Preparar ficha de oportunidad y enviar mensaje directo.";
+   if(type.includes("Universidad")) return "Solicitar apoyo técnico, práctica aplicada o lectura territorial.";
+   if(type.includes("Empresa") || type.includes("Emprendimiento")) return "Abrir conversación sobre recursos, compras locales o voluntariado.";
+   if(text.includes("territorio")) return "Convocar una conversación corta de validación territorial.";
+   return "Enviar mensaje directo y validar interés de colaboración.";
+ }
+ function guidedNetworkPanel(){
+   return `<div class="guided-network">
+     <div class="guided-header">
+       <div>
+         <p class="eyebrow">Vista recomendada</p>
+         <h3>Mapa guiado de conexiones</h3>
+         <p>Esta lectura evita las líneas cruzadas: muestra el actor foco, las organizaciones priorizadas, el motivo del enlace y la acción sugerida para activar la conexión.</p>
+       </div>
+       <div class="guided-score">
+         <small>Actor foco</small>
+         <strong>${safeAttr(shortName(selected.nombre))}</strong>
+         <span>${safeAttr(selected.territorio)} · Confianza ${safeAttr(selected.nivelConfianza)}/5</span>
+       </div>
+     </div>
+     <div class="guided-flow">
+       <div class="guided-lane">
+         <span class="guided-lane-title">1. Actor foco</span>
+         <button type="button" class="guided-node-card focus" onclick="selectedActor=actors.find(a=>a.id==='${safeAttr(selected.id)}');setActive('Perfil de actor')">
+           <span class="guided-card-top"><span class="guided-dot" style="background:${nodeColor(selected.tipo)}"></span><strong>${safeAttr(selected.nombre)}</strong></span>
+           <em>${safeAttr(selected.tipo)} · ${safeAttr(selected.capitalPrincipal)}</em>
+           <span class="meta">Centralidad ${safeAttr(selected.centrality)}%</span>
+         </button>
+       </div>
+       <div class="guided-lane">
+         <span class="guided-lane-title">2. Conexiones priorizadas</span>
+         ${guidedMatches.length ? guidedMatches.map(match=>`
+           <button type="button" class="guided-node-card connected" onclick="selectedNetworkNode='${safeAttr(match.actor.id)}';render()">
+             <span class="guided-card-top"><span class="guided-dot" style="background:${nodeColor(match.actor.tipo)}"></span><strong>${safeAttr(match.actor.nombre)}</strong></span>
+             <em>${safeAttr(match.actor.tipo)} · ${safeAttr(match.actor.territorio)}</em>
+             <span class="meta">Afinidad ${safeAttr(match.score)}%</span>
+           </button>
+         `).join("") : `<p class="guided-empty">Completa necesidades y recursos del actor foco para generar conexiones priorizadas.</p>`}
+       </div>
+       <div class="guided-lane">
+         <span class="guided-lane-title">3. Razón y acción</span>
+         ${guidedMatches.length ? guidedMatches.map((match,i)=>`
+           <div class="guided-action">
+             <div class="guided-index">${i+1}</div>
+             <div>
+               <strong>${safeAttr(matchKind(match))}</strong>
+               <p>${safeAttr((match.reasons || []).slice(0,2).join(" · "))}</p>
+               <span>${safeAttr(matchAction(match))}</span>
+             </div>
+           </div>
+         `).join("") : `<p class="guided-empty">Cuando haya coincidencias, aquí se verá el motivo de cada relación y el siguiente paso.</p>`}
+       </div>
+     </div>
+     <div class="guided-table-wrap">
+       <table class="guided-table">
+         <thead><tr><th>Conexión</th><th>Lectura</th><th>Acción sugerida</th><th>Afinidad</th></tr></thead>
+         <tbody>
+           ${guidedMatches.length ? guidedMatches.map(match=>`
+             <tr>
+               <td><strong>${safeAttr(selected.nombre)}</strong><br><small>${safeAttr(match.actor.nombre)}</small></td>
+               <td>${safeAttr(matchKind(match))}<br><small>${safeAttr((match.reasons || []).join(" · "))}</small></td>
+               <td>${safeAttr(matchAction(match))}</td>
+               <td><strong>${safeAttr(match.score)}%</strong></td>
+             </tr>
+           `).join("") : `<tr><td colspan="4">No hay conexiones priorizadas para esta selección.</td></tr>`}
+         </tbody>
+       </table>
+     </div>
+   </div>`;
+ }
  return `
  ${section("Análisis relacional","Red de relaciones, confianza y colaboración","Esta vista permite identificar actores puente, conexiones intersectoriales, vínculos de confianza y oportunidades para fortalecer el capital relacional del ecosistema.")}
  <div class="grid stats">
    ${stat("R","Densidad de red","0.42","Nivel estimado de conexión")}
    ${stat("P","Actores puente","12","Nodos con alta centralidad")}
    ${stat("C","Conexiones visibles",links.length,"Relaciones y sugerencias")}
-   ${stat("A","Actor foco",shortName(selected.nombre),"Clic en un nodo para mover la red")}
+  ${stat("A","Actor foco",shortName(selected.nombre),networkLayoutMode==="guiado"?"Conexiones explicadas por rutas":"Clic en un nodo para mover la red")}
  </div>
  <div class="grid mapgrid">
    <div class="card">
      <div class="network-controls">
+       <button class="btn outline ${networkLayoutMode==="guiado"?"active":""}" onclick="setNetworkLayout('guiado')">Mapa guiado</button>
        <button class="btn outline ${networkLayoutMode==="relacional"?"active":""}" onclick="setNetworkLayout('relacional')">Foco relacional</button>
        <button class="btn outline ${networkLayoutMode==="tipo"?"active":""}" onclick="setNetworkLayout('tipo')">Por tipo</button>
        <button class="btn outline ${networkLayoutMode==="confianza"?"active":""}" onclick="setNetworkLayout('confianza')">Por confianza</button>
      </div>
-     <div class="network-wrap">
+     ${networkLayoutMode==="guiado" ? guidedNetworkPanel() : ""}
+     <div class="network-wrap ${networkLayoutMode==="guiado"?"hidden-view":""}">
        <svg viewBox="0 0 900 540" class="network">
          <defs>
            <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
@@ -2536,7 +3159,7 @@ const typeColors={
          }).join("")}
        </svg>
      </div>
-     <div class="network-legend">
+     <div class="network-legend ${networkLayoutMode==="guiado"?"hidden-view":""}">
        ${legendTypes.map(t=>`<span class="legend-item"><span class="legend-dot" style="background:${nodeColor(t)}"></span>${safeAttr(t.replace("Organización de la sociedad civil","OSC").replace("Universidad / centro de conocimiento","Universidad"))}</span>`).join("")}
      </div>
    </div>
@@ -2570,8 +3193,8 @@ const typeColors={
    </div>
    <div class="card">
      <h3 style="color:var(--blue);font-size:24px;margin-top:0">Lectura estratégica</h3>
-     <p style="color:#5f6b67;line-height:1.55">La red ahora se reordena alrededor del actor seleccionado. Los enlaces naranjas muestran relaciones sugeridas o directas; los nodos conectados se resaltan para facilitar lectura de capital relacional.</p>
-     <div class="grid two">${info("Modo activo",networkLayoutMode)}${info("Relaciones foco",suggested.length)}${info("Acción sugerida","Activar conversación")}${info("Uso del dato","Matching y validación")}</div>
+    <p style="color:#5f6b67;line-height:1.55">${networkLayoutMode==="guiado"?"El mapa guiado convierte la red en rutas de lectura: actor foco, organización conectada, razón de la coincidencia y acción recomendada. Los otros modos conservan la exploración por nodos para análisis más técnico.":"La red se reordena alrededor del actor seleccionado. Los enlaces naranjas muestran relaciones sugeridas o directas; los nodos conectados se resaltan para facilitar lectura de capital relacional."}</p>
+    <div class="grid two">${info("Modo activo",safeAttr(modeLabel))}${info("Relaciones foco",suggested.length)}${info("Acción sugerida","Activar conversación")}${info("Uso del dato","Matching y validación")}</div>
    </div>
  </div>`;
 }
@@ -2581,7 +3204,7 @@ function viewOportunidades(){
  const dynamicMatches=suggestConnections(focus);
  return `${section("Matching territorial","Oportunidades de articulación","Cruce inteligente entre necesidades, recursos disponibles, confianza, territorio compartido, visibilidad y capacidad de absorción.")}
  <div class="grid stats">${stat("*","Identificadas",dynamicMatches.length+opportunities.length)}${stat("M","En contacto","12")}${stat("P","En proceso","8")}${stat("C","Concretadas","5")}</div>
- <div class="card" style="margin:18px 0"><strong style="color:var(--blue)">Criterios de coincidencia:</strong> complementariedad entre necesidad y recurso, temas comunes, validación territorial, confianza, territorio compartido y capacidad de absorción.</div>
+ <div class="card" style="margin:18px 0"><strong style="color:var(--blue)">Criterios de coincidencia:</strong> complementariedad entre necesidad y recurso, temas comunes, validación territorial, confianza, territorio compartido, capacidad de absorción y datos actualizados durante el trimestre.</div>
  <div class="grid mapgrid">
    <div class="grid">
      ${dynamicMatches.map(match=>`
@@ -2617,6 +3240,20 @@ function viewGobernanza(){
    ${stat("P","Perfiles privados",privateCount)}
    ${stat("A","Aliados verificados",actors.filter(a=>a.visibilidad==="Aliados verificados").length)}
    ${stat("90","Meta de apropiación","90 días","Primer ciclo crítico de uso")}
+ </div>
+ <div class="grid two" style="margin-top:18px">
+   <div class="card">
+     <p class="eyebrow">Operación de actualización</p>
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">WhatsApp como canal de mantenimiento del mapa</h3>
+     <p class="mini-note">La Fundación Territorial puede priorizar perfiles vencidos o pendientes y preparar mensajes de actualización sin salir de la demo.</p>
+     ${whatsappUpdateQueue(5)}
+   </div>
+   <div class="card">
+     <p class="eyebrow">Fidelización</p>
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Reconocimiento trimestral como incentivo</h3>
+     <p class="mini-note">La plataforma devuelve valor a quien aporta datos: más visibilidad, mejor ranking de matching y mención en informes territoriales.</p>
+     ${quarterlyRecognitionPanel(5)}
+   </div>
  </div>
  <div class="governance-grid" style="margin-top:18px">
    <div class="card">
@@ -2661,6 +3298,23 @@ function viewReportes(){
  return `${section("Reportes territoriales","Alertas, prioridades y decisiones sugeridas","El sistema transforma datos dispersos en insumos para orientar inversión social, acompañamiento territorial y expansión de Fundaciones Territoriales.")}
  <div class="grid two">${chartCard("Densidad de red por territorio",territories.slice(0,7).map((t,i)=>({name:t.name.slice(0,11),value:28+i*6})))}${chartCard("Oportunidades de inversión social",[{name:"Ambiente",value:12},{name:"Cultura",value:9},{name:"Juventud",value:8},{name:"Economía",value:7},{name:"Gobernanza",value:6}],"blue")}</div>
  <div class="grid two" style="margin-top:20px">${alerts.map(a=>`<div class="card alert"><div class="spark">⚠️</div><p>${a}</p></div>`).join("")}</div>
+ <div class="grid two" style="margin-top:20px">
+   <div class="card">
+     <p class="eyebrow">Reconocimiento trimestral</p>
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Anexo de organizaciones que mantuvieron vivo el mapa</h3>
+     <p class="mini-note">Este listado simula el apartado del informe territorial donde se referencia a organizaciones que actualizaron sus datos durante ${currentQuarterLabel()}.</p>
+     ${quarterlyRecognitionPanel(6)}
+   </div>
+   <div class="card">
+     <p class="eyebrow">Ejemplos para due diligence territorial</p>
+     <h3 style="color:var(--blue);font-size:24px;margin-top:0">Lecturas concretas para Fundaciones Territoriales</h3>
+     ${[
+       ["Guasca","La Fundación puede mostrar a donantes que hay una base ambiental activa, pero que falta conectar oferta empresarial con restauración ecológica."],
+       ["Montes de María","El mapa permite evidenciar capital cultural fuerte y justificar una ruta de cooperación con universidades y financiadores."],
+       ["Alto Putumayo","La baja densidad de conexiones permite priorizar acompañamiento a liderazgos comunitarios antes de abrir convocatorias grandes."]
+     ].map(row=>`<div class="info-row"><small>${safeAttr(row[0])}</small><strong>${safeAttr(row[1])}</strong></div>`).join("")}
+   </div>
+ </div>
  <div class="filters" style="margin-top:20px"><button class="btn" onclick="toast('Reporte descargado en modo demo.')">Descargar reporte</button><button class="btn" onclick="toast('Recomendación generada correctamente.')">Generar recomendación</button><button class="btn" onclick="toast('Territorio priorizado para análisis.')">Priorizar territorio</button></div>`;
 }
 
@@ -2670,5 +3324,8 @@ restoreImportedActors();
 refreshActorIntelligence();
 render();
 </script>
+</body>
+</html>
+
 </body>
 </html>
